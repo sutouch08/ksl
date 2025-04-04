@@ -1,11 +1,4 @@
-*.png
-*.jpg
-*.gif
-*.ico
-*.mp3
-*.pdf
-*.xls
-*.xlsx
+
 .htaccess
 index.php
 /application/config/database.php
