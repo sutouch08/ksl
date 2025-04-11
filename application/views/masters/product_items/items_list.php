@@ -170,16 +170,6 @@
 								</button>
 
 								<ul class="dropdown-menu">
-									<?php if($this->wmsApi) : ?>
-										<li>
-											<a href="javascript:sendToWms('<?php echo $rs->code; ?>')"><i class="fa fa-send green"></i> Send To WMS</a>
-										</li>
-									<?php endif; ?>
-									<?php if($this->sokoApi) : ?>
-										<li>
-											<a href="javascript:sendToSoko('<?php echo $rs->code; ?>')"><i class="fa fa-send blue"></i> Send To Soko Jung</a>
-										</li>
-									<?php endif; ?>
 									<?php if($this->pm->can_add) : ?>
 										<li>
 											<a href="javascript:duplicate('<?php echo $rs->id; ?>')"><i class="fa fa-copy purple"></i> Duplicate</a>
@@ -219,7 +209,6 @@
 						<td class="middle text-center"><?php echo is_active($rs->can_sell); ?></td>
 						<td class="middle text-center"><?php echo is_active($rs->active); ?></td>
 						<td class="middle"><?php echo $rs->old_code; ?></td>
-
 					</tr>
 					<?php $no++; ?>
 				<?php endforeach; ?>

@@ -7,12 +7,8 @@ class Products extends PS_Controller
   public $menu_sub_group_code = 'PRODUCT';
 	public $title = 'เพิ่ม/แก้ไข สินค้า';
   public $error = '';
-	public $wms;
-	public $wms_export_item;
-  public $soko_export_item;
-  public $wmsApi = FALSE;
-  public $sokoApi = FALSE;
 
+  
   public function __construct()
   {
     parent::__construct();
@@ -45,16 +41,6 @@ class Products extends PS_Controller
     $this->load->helper('product_sub_group');
     $this->load->helper('product_images');
     $this->load->helper('unit');
-
-		$this->wms = $this->load->database('wms', TRUE);
-		$this->load->library('wms_product_api');
-    $this->load->library('soko_product_api');
-
-    $this->wmsApi = is_true(getConfig('WMS_API'));
-    $this->sokoApi = is_true(getConfig('SOKOJUNG_API'));
-
-		$this->wms_export_item = getConfig('WMS_EXPORT_ITEMS');
-
   }
 
 
@@ -1365,117 +1351,6 @@ class Products extends PS_Controller
 
     echo $sc === TRUE ? 'success' : "Success : {$success}, Fail : {$fail}";
   }
-
-
-
-	public function send_to_wms()
-	{
-		$sc = TRUE;
-
-		$code = trim($this->input->post('code')); //--- style code
-
-		if( ! empty($code))
-		{
-      if($this->wmsApi)
-      {
-        $items = $this->products_model->get_style_items($code);
-
-        if( ! empty($items))
-        {
-          $export = $this->wms_product_api->export_style($code, $items);
-
-          if(!$export)
-          {
-            $sc = FALSE;
-            $this->error = "Error : ".$this->wms_product_api->error;
-          }
-        }
-        else
-        {
-          $sc = FALSE;
-          $this->error = "Items not found";
-        }
-      }
-      else
-      {
-        $sc = FALSE;
-        $this->error = "API is  not enabled";
-      }
-		}
-		else
-		{
-			$sc = FALSE;
-			$this->error = "Missing required parameter: code";
-		}
-
-		echo $sc === TRUE ? 'success' : $this->error;
-	}
-
-
-  public function send_to_soko()
-	{
-		$sc = TRUE;
-    $msg = "";
-    $count = 0;
-    $success = 0;
-    $failed = 0;
-
-		$code = trim($this->input->post('code')); //--- style code
-
-		if( ! empty($code))
-		{
-      if($this->sokoApi)
-      {
-        $items = $this->products_model->get_style_items($code);
-
-        if( ! empty($items))
-        {
-          $count = count($items);
-
-          foreach($items as $item)
-          {
-            if(empty($item->soko_code))
-            {
-              if( ! $this->soko_product_api->create_item($item->code, $item))
-              {
-                $sc = FALSE;
-                $msg .= "\n{$item->code} : {$this->soko_product_api->error}";
-                $failed++;
-              }
-            }
-            else
-            {
-              if( ! $this->soko_product_api->update_item($item->code, $item))
-              {
-                $sc = FALSE;
-                $msg .= "\n{$item->code} : {$this->soko_product_api->error}";
-                $failed++;
-              }
-            }
-          }
-
-          $this->error = $sc === FALSE ? "Failed : {$failed} Of {$count} items ".$msg : "";
-        }
-        else
-        {
-          $sc = FALSE;
-          $this->error = "Items not found";
-        }
-      }
-      else
-      {
-        $sc = FALSE;
-        $this->error = "API is not enabled";
-      }
-		}
-		else
-		{
-			$sc = FALSE;
-			$this->error = "Missing required parameter: code";
-		}
-
-		echo $sc === TRUE ? 'success' : $this->error;
-	}
 
 
 

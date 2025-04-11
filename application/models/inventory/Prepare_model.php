@@ -259,7 +259,7 @@ class Prepare_model extends CI_Model
   }
 
 
-  public function count_rows(array $ds = array(), $state = 3, $full_mode = TRUE)
+  public function count_rows(array $ds = array(), $state = 3)
   {
     $this->db
     ->select('o.state')
@@ -283,11 +283,6 @@ class Prepare_model extends CI_Model
     $this->db
     ->where('o.state', $state)
     ->where('o.status', 1);
-
-		if($full_mode === TRUE)
-		{
-			$this->db->where('o.is_wms', 0);
-		}
 
     if(!empty($ds['code']))
     {
@@ -417,7 +412,7 @@ class Prepare_model extends CI_Model
   }
 
 
-  public function get_list(array $ds = array(), $perpage = 20, $offset = 0, $state = 3, $full_mode = TRUE)
+  public function get_list(array $ds = array(), $perpage = 20, $offset = 0, $state = 3)
   {
     $this->db
 		->select('o.id, o.code, o.role, o.reference, o.customer_code, o.customer_name, o.customer_ref, o.date_add, o.channels_code, o.is_cancled')
@@ -431,11 +426,6 @@ class Prepare_model extends CI_Model
     {
       $this->db->join('order_details AS od', 'o.code = od.order_code','left');
     }
-
-		if($full_mode === TRUE)
-		{
-			$this->db->where('o.is_wms', 0);
-		}
 
     if($state == 4)
     {

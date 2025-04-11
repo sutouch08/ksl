@@ -7,22 +7,11 @@ class Items extends PS_Controller
   public $menu_sub_group_code = 'PRODUCT';
 	public $title = 'เพิ่ม/แก้ไข รายการสินค้า';
   public $error = '';
-	public $wms;
-  public $wmsApi = FALSE;
-  public $sokoApi = FALSE;
 
   public function __construct()
   {
     parent::__construct();
     $this->home = base_url().'masters/items';
-
-		//--- load database
-		$this->wms = $this->load->database('wms', TRUE);
-		$this->load->library('wms_product_api');
-    $this->load->library('soko_product_api');
-
-    $this->wmsApi = is_true(getConfig('WMS_API'));
-    $this->sokoApi = is_true(getConfig('SOKOJUNG_API'));
 
     //--- load model
     $this->load->model('masters/products_model');
@@ -640,102 +629,6 @@ class Items extends PS_Controller
 
 
 
-
-	public function send_to_wms()
-	{
-		$sc = TRUE;
-		$code = trim($this->input->post('code'));
-
-    if($this->wmsApi)
-    {
-      if( ! empty($code))
-      {
-        $item = $this->products_model->get($code);
-
-        if( ! empty($item))
-        {
-          if( ! $this->wms_product_api->export_item($item->code, $item))
-          {
-            $sc = FALSE;
-            $this->error = "Error: ".$this->wms_product_api->error;
-          }
-        }
-        else
-        {
-          $sc = FALSE;
-          $this->error = "Item not found";
-        }
-      }
-      else
-      {
-        $sc = FALSE;
-        $this->error = "Missing required parameter : code";
-      }
-    }
-
-
-		echo $sc === TRUE ? 'success' : $this->error;
-	}
-
-
-  public function send_to_soko()
-	{
-		$sc = TRUE;
-
-		$code = trim($this->input->post('code'));
-
-    if($this->sokoApi)
-    {
-      if( ! empty($code))
-      {
-        $item = $this->products_model->get($code);
-
-        if( ! empty($item))
-        {
-          if( ! empty($item->barcode))
-          {
-            if(empty($item->soko_code))
-            {
-              if( ! $this->soko_product_api->create_item($item->code, $item))
-              {
-                $sc = FALSE;
-                $this->error = "Error: ".$this->soko_product_api->error;
-              }
-            }
-            else
-            {
-              if( ! $this->soko_product_api->update_item($item->code, $item))
-              {
-                $sc = FALSE;
-                $this->error = "Error : ".$this->soko_product_api->error;
-              }
-            }
-          }
-          else
-          {
-            $sc = FALSE;
-            $this->error = "Barcode not found !";
-          }
-        }
-        else
-        {
-          $sc = FALSE;
-          $this->error = "Item not found";
-        }
-      }
-      else
-      {
-        $sc = FALSE;
-        $this->error = "Missing required parameter : code";
-      }
-    }
-
-
-		echo $sc === TRUE ? 'success' : $this->error;
-	}
-
-
-
   public function do_export($code, $method = 'A')
   {
 		$sc = TRUE;
@@ -792,19 +685,12 @@ class Items extends PS_Controller
       'F_E_CommerceDate' => sap_date(now(), TRUE)
     );
 
-		if($this->products_model->add_item($ds))
+		if( ! $this->products_model->add_item($ds))
 		{
-      if($this->wmsApi)
-      {
-        $this->wms_product_api->export_item($item->code, $item);
-      }
+      $sc = FALSE;
+      $this->error = "Update Item failed";
 		}
-		else
-		{
-			$sc = FALSE;
-			$this->error = "Update Item failed";
-		}
-
+		
     return $sc;
 
   }

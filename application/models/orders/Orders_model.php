@@ -270,8 +270,6 @@ class Orders_model extends CI_Model
   }
 
 
-
-	//--- use by wms api
 	public function get_order_uncount_details($order_code)
 	{
 		$rs = $this->db
@@ -790,20 +788,6 @@ class Orders_model extends CI_Model
       }
     }
 
-		if(isset($ds['wms_export']) && $ds['wms_export'] !== 'all')
-		{
-			if($ds['wms_export'] == 0)
-			{
-				$this->db->group_start();
-				$this->db->where('wms_export IS NULL', NULL, FALSE);
-				$this->db->or_where('wms_export', 0);
-				$this->db->group_end();
-			}
-			else
-			{
-				$this->db->where('wms_export', $ds['wms_export']);		}
-		}
-
     if(isset($ds['is_backorder']) && $ds['is_backorder'] != 'all')
     {
       $this->db->where('is_backorder', $ds['is_backorder']);
@@ -1069,19 +1053,6 @@ class Orders_model extends CI_Model
       }
     }
 
-		if(isset($ds['wms_export']) && $ds['wms_export'] !== 'all')
-		{
-			if($ds['wms_export'] == 0)
-			{
-				$this->db->group_start();
-				$this->db->where('wms_export IS NULL', NULL, FALSE);
-				$this->db->or_where('wms_export', 0);
-				$this->db->group_end();
-			}
-			else
-			{
-				$this->db->where('wms_export', $ds['wms_export']);		}
-		}
 
     if(isset($ds['is_backorder']) && $ds['is_backorder'] != 'all')
     {
@@ -1197,7 +1168,7 @@ class Orders_model extends CI_Model
     $this->db
     ->select('id, code, role, reference, customer_code, customer_name, customer_ref')
     ->select('channels_code, payment_code, state, status, warehouse_code, zone_code, date_add, is_expired, doc_total')
-    ->select('is_wms, wms_export, is_backorder, is_approved, user, empName, is_cancled')
+    ->select('is_backorder, is_approved, user, empName, is_cancled')
     ->where('role', $role);
 
     if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
@@ -1350,21 +1321,7 @@ class Orders_model extends CI_Model
       }
     }
 
-		if(isset($ds['wms_export']) && $ds['wms_export'] !== 'all')
-		{
-			if($ds['wms_export'] == 0)
-			{
-				$this->db->group_start();
-				$this->db->where('wms_export IS NULL', NULL, FALSE);
-				$this->db->or_where('wms_export', 0);
-				$this->db->group_end();
-			}
-			else
-			{
-				$this->db->where('wms_export', $ds['wms_export']);		}
-		}
-
-    if(isset($ds['is_backorder']) && $ds['is_backorder'] != 'all')
+	  if(isset($ds['is_backorder']) && $ds['is_backorder'] != 'all')
     {
       $this->db->where('is_backorder', $ds['is_backorder']);
     }

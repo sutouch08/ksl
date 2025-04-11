@@ -17,9 +17,7 @@ class Prepare extends PS_Controller
     $this->load->model('inventory/prepare_model');
     $this->load->model('orders/orders_model');
     $this->load->model('orders/order_state_model');
-    $this->load->model('masters/warehouse_model');
-
-    $this->full_mode = is_true(getConfig('WMS_FULL_MODE'));
+    $this->load->model('masters/warehouse_model');    
   }
 
 

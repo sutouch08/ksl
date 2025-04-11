@@ -49,9 +49,6 @@
 				<?php else : ?>
 					<button type="button" id="btn-save-order" class="btn btn-xs btn-success btn-100 top-btn hide" onclick="saveOrder()">บันทึก</button>
 				<?php endif; ?>
-				<?php if($is_api && $order->is_wms != 0 && $order->status == 1 && $order->is_expired == 0 && $order->state == 3) : ?>
-					<button type="button" class="btn btn-xs btn-success top-btn" onclick="sendToWMS()">Send to WMS</button>
-				<?php endif; ?>
       </p>
     </div>
 </div><!-- End Row -->
@@ -75,8 +72,5 @@
 <script src="<?php echo base_url(); ?>scripts/print/print_order.js?v=<?php echo date('Ymd'); ?>"></script>
 <script src="<?php echo base_url(); ?>scripts/print/print_address.js?v=<?php echo date('Ymd'); ?>"></script>
 <script src="<?php echo base_url(); ?>scripts/cancel_order.js?v=<?php echo date('Ymd'); ?>"></script>
-<?php if($order->is_wms && $order->status == 1 && $order->is_expired == 0 && $order->state == 3) : ?>
-	<script src="<?php echo base_url(); ?>scripts/wms/wms_order.js?v=<?php echo date('Ymd'); ?>"></script>
-<?php endif; ?>
 
 <?php $this->load->view('include/footer'); ?>
