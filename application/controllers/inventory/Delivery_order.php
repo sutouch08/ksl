@@ -109,17 +109,17 @@ class Delivery_order extends PS_Controller
         $this->error = "ออเดอร์ถูกยกเลิกบน Platform แล้ว";
       }
 
-      if($sc === TRUE)
-      {
-        if( ! empty($order->reference) && ($order->channels_code == '0009'))
-        {
-          if($this->is_cancel($order->reference, $order->channels_code))
-          {
-            $sc = FALSE;
-            $this->error = "ออเดอร์ถูกยกเลิกบน Platform แล้ว";
-          }
-        }
-      }
+      // if($sc === TRUE)
+      // {
+      //   if( ! empty($order->reference) && ($order->channels_code == '0009'))
+      //   {
+      //     if($this->is_cancel($order->reference, $order->channels_code))
+      //     {
+      //       $sc = FALSE;
+      //       $this->error = "ออเดอร์ถูกยกเลิกบน Platform แล้ว";
+      //     }
+      //   }
+      // }
     }
     else
     {

@@ -476,10 +476,10 @@ class Qc extends PS_Controller
       //--- check cancel request
       $is_cancel = $this->orders_model->is_cancel_request($order->code);
 
-      if( ! $is_cancel && ! empty($order->reference) && ($order->channels_code == '0009'))
-      {
-        $is_cancel = $this->is_cancel($order->reference, $order->channels_code);
-      }
+      // if( ! $is_cancel && ! empty($order->reference) && ($order->channels_code == '0009'))
+      // {
+      //   $is_cancel = $this->is_cancel($order->reference, $order->channels_code);
+      // }
 
       if( ! $is_cancel)
       {

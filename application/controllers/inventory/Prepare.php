@@ -17,7 +17,7 @@ class Prepare extends PS_Controller
     $this->load->model('inventory/prepare_model');
     $this->load->model('orders/orders_model');
     $this->load->model('orders/order_state_model');
-    $this->load->model('masters/warehouse_model');    
+    $this->load->model('masters/warehouse_model');
   }
 
 
@@ -271,10 +271,10 @@ class Prepare extends PS_Controller
       //--- check cancel request
       $is_cancel = $this->orders_model->is_cancel_request($order->code);
 
-      if( ! $is_cancel && ! empty($order->reference) && ($order->channels_code == '0009'))
-      {
-        $is_cancel = $this->is_cancel($order->reference, $order->channels_code);
-      }
+      // if( ! $is_cancel && ! empty($order->reference) && ($order->channels_code == '0009'))
+      // {
+      //   $is_cancel = $this->is_cancel($order->reference, $order->channels_code);
+      // }
 
       if( ! $is_cancel)
       {

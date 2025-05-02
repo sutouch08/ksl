@@ -137,8 +137,8 @@ $config['auth_source'] = '';//'ldap';
 | requests etc), set to TRUE;
 |
 */
-$config['allow_auth_and_keys'] = TRUE;
-$config['strict_api_and_auth'] = TRUE; // force the use of both api and auth before a valid api request is made
+$config['allow_auth_and_keys'] = FALSE;
+$config['strict_api_and_auth'] = FALSE; // force the use of both api and auth before a valid api request is made
 
 /*
 |--------------------------------------------------------------------------
