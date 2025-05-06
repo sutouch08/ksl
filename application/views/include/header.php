@@ -52,7 +52,7 @@
 			<div class="navbar-container" id="navbar-container">
 				<?php if(! isset($_GET['nomenu'])) : ?>
 				<!-- #section:basics/sidebar.mobile.toggle -->
-				<button type="button" class="navbar-toggle menu-toggler pull-left" id="menu-toggler" data-target="#sidebar">
+				<button type="button" class="navbar-toggle menu-toggler pull-left" id="menu-toggler" data-target="#sidebar" style="background-color:#ff5722;">
 					<span class="sr-only">Toggle sidebar</span>
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
@@ -80,7 +80,7 @@
 					<ul class="nav ace-nav">
 
 						<li class="light-blue">
-							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
+							<a data-toggle="dropdown" href="#" class="dropdown-toggle" style="background-color:#ff5722;">
 
 								<span class="user-info">
 									<small>Welcome</small>
