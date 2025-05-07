@@ -19,12 +19,11 @@ class Products extends REST_Controller
 	public function countUpdateItem_post()
 	{
 		$json = file_get_contents("php://input");
-		$data = json_decode($json);
+		$ds = json_decode($json);
+    $last_sync = (isset($ds) && isset($ds->date)) ? $ds->date : '2020-01-01 00:00:00';
 
-		if(! empty($data))
+		if( ! empty($last_sync))
 		{
-			$last_sync = empty($data->date) ? '2020-01-01 00:00:00' : $data->date;
-
 			$rs = $this->db
       ->where('count_stock', 1)
       ->where('barcode IS NOT NULL', NULL, FALSE)
@@ -59,8 +58,8 @@ class Products extends REST_Controller
 	{
 		$json = file_get_contents("php://input");
 		$ds = json_decode($json);
-
-		if(! empty($ds))
+      
+		if( ! empty($ds))
 		{
 			$date = $ds->date;
 			$limit = $ds->limit;
