@@ -16,7 +16,7 @@ class Products extends REST_Controller
   }
 
   //--- for check stock
-	public function countUpdateItem_get()
+	public function countUpdateItem_post()
 	{
 		$json = file_get_contents("php://input");
 		$data = json_decode($json);
@@ -55,7 +55,7 @@ class Products extends REST_Controller
 	}
 
   //---- for check stock
-	public function getUpdateItem_get()
+	public function getUpdateItem_post()
 	{
 		$json = file_get_contents("php://input");
 		$ds = json_decode($json);
@@ -109,5 +109,5 @@ class Products extends REST_Controller
 
 			$this->response($arr, 400);
 		}
-	}  
+	}
 } //--- end class

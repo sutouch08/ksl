@@ -32,7 +32,7 @@ class Zone extends REST_Controller
 	}
 
 
-	public function getUpdateZone_get()
+	public function getUpdateZone_post()
 	{
 		$json = file_get_contents("php://input");
 		$ds = json_decode($json);
