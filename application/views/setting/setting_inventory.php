@@ -97,10 +97,18 @@
       <div class="divider-hidden"></div>
 
 			<div class="col-sm-3">
-        <span class="form-control left-label">รหัสคลังซื้อ-ขาย เริ่มต้น</span>
+        <span class="form-control left-label">คลังซื้อ-ขาย เริ่มต้น</span>
       </div>
       <div class="col-sm-9">
         <input type="text" class="form-control input-sm input-large" id="default-warehouse" name="DEFAULT_WAREHOUSE" value="<?php echo $DEFAULT_WAREHOUSE; ?>" required/>
+      </div>
+      <div class="divider-hidden"></div>
+
+			<div class="col-sm-3">
+        <span class="form-control left-label">โซนซื้อ-ขาย เริ่มต้น</span>
+      </div>
+      <div class="col-sm-9">
+        <input type="text" class="form-control input-sm input-large" id="default-zone" name="DEFAULT_ZONE" value="<?php echo $DEFAULT_ZONE; ?>" required/>
       </div>
       <div class="divider-hidden"></div>
 

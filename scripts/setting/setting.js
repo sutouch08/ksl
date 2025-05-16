@@ -588,6 +588,23 @@ $('#default-warehouse').autocomplete({
 	}
 })
 
+
+$('#default-zone').autocomplete({
+	source: BASE_URL + 'auto_complete/get_zone_code_and_name',
+	autoFocus:true,
+	close:function(){
+		let rs = $(this).val();
+		let arr = rs.split(' | ');
+
+		if(arr[0] === 'not found'){
+			$(this).val('');
+		}else{
+			$(this).val(arr[0]);
+		}
+	}
+})
+
+
 $('#lend-warehouse').autocomplete({
 	source: BASE_URL + 'auto_complete/get_warehouse_by_role/8',
 	autoFocus:true,
