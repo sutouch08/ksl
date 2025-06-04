@@ -119,7 +119,7 @@ while($total_page > 0 )
       $data = array(
                     $n,
                     $barcode,
-                    inputRow($rs->product_code.' : '.$rs->product_name),
+                    inputRow($rs->old_code.' : '.$rs->product_name),
                     number($price, 2),
                     number($qty),
                     $discount,

@@ -334,7 +334,7 @@ class Orders_model extends CI_Model
   public function get_order_details($code)
   {
     $rs = $this->db
-    ->select('order_details.*, products.unit_code')
+    ->select('order_details.*, products.unit_code, products.old_code, products.barcode')
     ->from('order_details')
     ->join('products', 'order_details.product_code = products.code', 'left')
     ->join('product_size', 'products.size_code = product_size.code', 'left')

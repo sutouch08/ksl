@@ -2126,15 +2126,7 @@ class Orders extends PS_Controller
     $this->load->library('printer');
     $order = $this->orders_model->get($code);
     $order->customer_name = $this->customers_model->get_name($order->customer_code);
-    $details = $this->orders_model->get_order_details($code);
-    if(!empty($details))
-    {
-      foreach($details as $rs)
-      {
-        $rs->barcode = $this->products_model->get_barcode($rs->product_code);
-      }
-    }
-
+    $details = $this->orders_model->get_order_details($code);    
     $ds['order'] = $order;
     $ds['details'] = $details;
     $ds['is_barcode'] = $barcode != '' ? TRUE : FALSE;
