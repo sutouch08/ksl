@@ -109,11 +109,13 @@ class Invoice extends PS_Controller
     $order->customer_name = $this->customers_model->get_name($order->customer_code);
     $details = $this->invoice_model->get_sum_details($code); //--- รายการที่มีการบันทึกขายไป
 
-    if(!empty($details))
+    if( ! empty($details))
     {
       foreach($details as $rs)
       {
-        $rs->barcode = $this->products_model->get_barcode($rs->product_code);
+        $pd = $this->products_model->get($rs->product_code);
+        $rs->barcode = empty($pd->barcode) ? NULL : $pd->barcode;
+        $rs->old_code = empty($pd->old_code) ? $pd->code : $pd->old_code;
       }
     }
 

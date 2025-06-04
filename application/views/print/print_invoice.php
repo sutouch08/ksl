@@ -115,11 +115,12 @@ while($total_page > 0 )
       $amount = $rs->total_amount;
 
       $barcode = $is_barcode === FALSE ? $rs->barcode : barcodeImage($rs->barcode);
+      $pd_code = empty($rs->old_code) ? $rs->code : $rs->old_code;
       //--- เตรียมข้อมูลไว้เพิ่มลงตาราง
       $data = array(
                     $n,
                     $barcode,
-                    inputRow($rs->product_code.' : '.$rs->product_name),
+                    inputRow($pd_code.' : '.$rs->product_name),
                     number($price, 2),
                     number($qty),
                     inputRow($discount,'text-align:center;'),
