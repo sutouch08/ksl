@@ -66,7 +66,7 @@ class Product_main_group extends PS_Controller
   {
     $data['code'] = $this->session->flashdata('code');
     $data['name'] = $this->session->flashdata('name');
-    $this->title = 'เพิ่ม กลุ่มย่อยสินค้า';
+    $this->title = 'เพิ่ม กลุ่มหลักสินค้า';
     $this->load->view('masters/product_main_group/product_main_group_add_view', $data);
   }
 
@@ -128,7 +128,7 @@ class Product_main_group extends PS_Controller
 
   public function edit($code)
   {
-    $this->title = 'แก้ไข กลุ่มย่อยสินค้า';
+    $this->title = 'แก้ไข กลุ่มหลักสินค้า';
     $rs = $this->product_main_group_model->get($code);
     $data = array(
       'code' => $rs->code,

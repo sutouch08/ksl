@@ -382,7 +382,7 @@ public function set_footer(array $data)
 		$row2 = 5;
 		$row4 = 8;
 		$row3 = $height - ($row1+$row2+$row4) - 2;
-		$footer = "<div style='width:190mm; height:".$height."mm; margin:auto;'>";
+		$footer = "<div style='width:{$this->content_width}mm; height:".$height."mm; margin:auto;'>";
 		foreach($data as $n=>$value)
 		{
 			$footer .="<div style='width:".$box_width."%; height:".$height."mm; text-align:center; float:left;'>";

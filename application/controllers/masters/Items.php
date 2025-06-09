@@ -143,7 +143,6 @@ class Items extends PS_Controller
           {
             if($i == 1)
             {
-              $i++;
               $headCol = array(
                 'A' => 'Code',
                 'B' => 'Name',
@@ -182,6 +181,7 @@ class Items extends PS_Controller
                 break;
               }
 
+              $i++;
             }
             else if(!empty($rs['A']))
             {
@@ -210,52 +210,52 @@ class Items extends PS_Controller
               if(!empty($color_code) && ! $this->product_color_model->is_exists($color_code))
               {
                 $sc = FALSE;
-                $this->error = "Color : {$color_code}  does not exists";
+                $this->error = "Color : {$color_code}  does not exists @line {$i}";
               }
               else if(!empty($size_code) && ! $this->product_size_model->is_exists($size_code))
               {
                 $sc = FALSE;
-                $this->error = "Size : {$size_code}  does not exists";
+                $this->error = "Size : {$size_code}  does not exists @line {$i}";
               }
               else if(!empty($group_code) && ! $this->product_group_model->is_exists($group_code))
               {
                 $sc = FALSE;
-                $this->error = "Product Group : {$group_code}  does not exists";
+                $this->error = "Product Group : {$group_code}  does not exists @line {$i}";
               }
 							else if(!empty($main_group_code) && ! $this->product_main_group_model->is_exists($main_group_code))
               {
                 $sc = FALSE;
-                $this->error = "Product Sub Group : {$sub_group_code}  does not exists";
+                $this->error = "Product Main Group : {$main_group_code}  does not exists @line {$i}";
               }
               else if(!empty($sub_group_code) && ! $this->product_sub_group_model->is_exists($sub_group_code))
               {
                 $sc = FALSE;
-                $this->error = "Product Sub Group : {$sub_group_code}  does not exists";
+                $this->error = "Product Sub Group : {$sub_group_code}  does not exists @line {$i}";
               }
               else if(!empty($category_code) && ! $this->product_category_model->is_exists($category_code))
               {
                 $sc = FALSE;
-                $this->error = "Product Category : {$category_code} does not exists";
+                $this->error = "Product Category : {$category_code} does not exists @line {$i}";
               }
               else if(!empty($kind_code) && ! $this->product_kind_model->is_exists($kind_code))
               {
                 $sc = FALSE;
-                $this->error = "Product Kind : {$kind_code} does not exists";
+                $this->error = "Product Kind : {$kind_code} does not exists @line {$i}";
               }
               else if(!empty($type_code) && ! $this->product_type_model->is_exists($type_code))
               {
                 $sc = FALSE;
-                $this->error = "Product Type : {$type_code} does not exists";
+                $this->error = "Product Type : {$type_code} does not exists @line {$i}";
               }
               else if(!empty($brand_code) && ! $this->product_brand_model->is_exists($brand_code))
               {
                 $sc = FALSE;
-                $this->error = "Brand : {$brand_code} does not exists";
+                $this->error = "Brand : {$brand_code} does not exists @line {$i}";
               }
               else if(! empty($collection_code) && ! $this->product_collection_model->is_exists($collection_code))
               {
                 $sc = FALSE;
-                $this->error = "Collection : {$collection_code} does not exists";
+                $this->error = "Collection : {$collection_code} does not exists @line {$i}";
               }
 
               if($sc === FALSE)
@@ -338,6 +338,8 @@ class Items extends PS_Controller
               {
                 $this->do_export($code);
               }
+
+              $i++;
             }
           } //-- end foreach
         }
@@ -690,7 +692,7 @@ class Items extends PS_Controller
       $sc = FALSE;
       $this->error = "Update Item failed";
 		}
-		
+
     return $sc;
 
   }

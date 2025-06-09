@@ -21,12 +21,16 @@ $total_row 	= count($details);
 
 $subtotal_row = 4;
 
-$config 		= array(
-                "total_row" => $total_row,
-                "font_size" => 10,
-                "header_rows" => 3,
-                "sub_total_row" => $subtotal_row
-            );
+$config = array(
+  // "page_width" => 148,
+  // "page_height" => 210,
+  // "content_width" => 140,
+  // "row" => 12,
+  "total_row" => $total_row,
+  "font_size" => 10,
+  "header_rows" => 3,
+  "sub_total_row" => $subtotal_row
+);
 
 $this->printer->config($config);
 
