@@ -152,7 +152,7 @@ class Temp_delivery_model extends CI_Model
   {
     $rs = $this->mc
     ->select('DLN1.ItemCode, DLN1.BinCode')
-    ->select_sum('DLN1.Quantity AS Qty')
+    ->select_sum('DLN1.Quantity', 'Qty')
     ->from('DLN1')
     ->join('ODLN', 'DLN1.DocEntry = ODLN.DocEntry', 'left')
     ->where('ODLN.F_Sap', 'N')
