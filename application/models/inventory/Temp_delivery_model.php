@@ -196,6 +196,8 @@ class Temp_delivery_model extends CI_Model
       ->join('OIBQ', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
       ->where('OBIN.BinCode', $zone_code)
       ->where_in('OIBQ.ItemCode', $item_list)
+      ->group_by('OBIN.BinCode')
+      ->group_by('OIBQ.ItemCode')
       ->get();
 
       if($rs->num_rows() > 0)
