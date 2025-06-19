@@ -148,18 +148,60 @@ class Temp_delivery_model extends CI_Model
   }
 
 
-
   public function get_error_list()
   {
     $rs = $this->mc
-    ->select('DocEntry, U_ECOMNO AS code')
-    ->where('F_Sap', 'N')
-    ->order_by('U_ECOMNO', 'ASC')
-    ->get('ODLN');
+    ->select('DLN1.ItemCode, DLN1.BinCode')
+    ->select_sum('DLN1.Quantity AS Qty')
+    ->from('DLN1')
+    ->join('ODLN', 'DLN1.DocEntry = ODLN.DocEntry', 'left')
+    ->where('ODLN.F_Sap', 'N')
+    ->group_by('DLN1.ItemCode')
+    ->group_by('DLN1.BINCode')
+    ->get();
 
     if($rs->num_rows() > 0)
     {
       return $rs->result();
+    }
+
+    return NULL;
+  }
+
+  // public function get_error_list()
+  // {
+  //   $rs = $this->mc
+  //   ->select('DocEntry, U_ECOMNO AS code')
+  //   ->where('F_Sap', 'N')
+  //   ->order_by('U_ECOMNO', 'ASC')
+  //   ->get('ODLN');
+  //
+  //   if($rs->num_rows() > 0)
+  //   {
+  //     return $rs->result();
+  //   }
+  //
+  //   return NULL;
+  // }
+
+
+  public function get_stock_zone($zone_code, array $item_list = array())
+  {
+    if( ! empty($item_list))
+    {
+      $rs = $this->ms
+      ->select('OIBQ.ItemCode, OBIN.BinCode')
+      ->select_sum('OIBQ.OnHandQty')
+      ->from('OBIN')
+      ->join('OIBQ', 'OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs', 'left')
+      ->where('OBIN.BinCode', $zone_code)
+      ->where_in('OIBQ.ItemCode', $item_list)
+      ->get();
+
+      if($rs->num_rows() > 0)
+      {
+        return $rs->result();
+      }
     }
 
     return NULL;
