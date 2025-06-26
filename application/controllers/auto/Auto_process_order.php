@@ -18,8 +18,8 @@ class Auto_process_order extends CI_Controller
   public function __construct()
   {
     parent::__construct();
-    $this->load->database('ms', TRUE);
-    $this->load->database('mc', TRUE);
+    $this->ms = $this->load->database('ms', TRUE);
+    $this->mc = $this->load->database('mc', TRUE);
     $this->home = base_url().'auto/auto_process_order';
 		$this->zone_code = getConfig('DEFAULT_ZONE'); //--- โซน เริ่มต้น
     $this->warehouse_code = getConfig('DEFAULT_WAREHOUSE');
