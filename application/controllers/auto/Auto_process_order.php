@@ -127,145 +127,123 @@ class Auto_process_order extends CI_Controller
           break;
         }
 
-        $ds = $this->orders_model->get_order_detail($order->code, $rs->product_code);
+        $qty = $rs->qty;
 
-        if( ! empty($ds))
+        foreach($ds as $ro)
         {
-          $item = $this->products_model->get($rs->product_code);
-
-          if(!empty($item))
+          if($qty > 0)
           {
-            $qty = $rs->qty;
+            $orderQty = $qty >= $ro->qty ? $ro->qty : $qty;
+            $qty = $qty - $orderQty;
 
-            foreach($ds as $ro)
+            //--- add prepare
+            if($sc === TRUE)
             {
-              if($qty > 0)
-              {
-                $orderQty = $qty >= $ro->qty ? $ro->qty : $qty;
-                $qty = $qty - $orderQty;
-
-                //--- add prepare
-                if($sc === TRUE)
-                {
-                  $prepare = array(
-                  'order_code' => $order->code,
-                  'product_code' => $item->code,
-                  'zone_code' => $this->zone_code,
-                  'qty' => $orderQty,
-                  'user' => $this->user,
-                  'order_detail_id' => $ro->id
-                  );
-
-                  if(! $this->prepare_model->add($prepare))
-                  {
-                    $sc = FALSE;
-                    $this->error = "Insert Prepare failed {$order->code} : {$item->code}";
-                  }
-                }
-
-                //---- insert Qc
-                if($sc === TRUE)
-                {
-                  $qc = array(
-                  'order_code' => $order->code,
-                  'product_code' => $item->code,
-                  'qty' => $orderQty,
-                  'box_id' => NULL,
-                  'user' => $this->user,
-                  'order_detail_id' => $ro->id
-                  );
-
-                  if(!$this->qc_model->add($qc))
-                  {
-                    $sc = FALSE;
-                    $this->error = "Insert Qc data failed : {$order->code} : {$rs->product_code}";
-                  }
-                }
-
-                $sell_price = ($ro->qty > 0) ? round($ro->total_amount/$ro->qty, 2) : $ro->price;
-                $discount_amount = ($ro->qty > 0) ? round($ro->discount_amount/$ro->qty, 2) : 0;
-                $id_policy = empty($ro->id_rule) ? NULL : $this->discount_rule_model->get_policy_id($ro->id_rule);
-
-                //--- ข้อมูลสำหรับบันทึกยอดขาย
-                $arr = array(
-                'reference' => $order->code,
-                'role' => $order->role,
-                'payment_code'   => $order->payment_code,
-                'channels_code'  => $order->channels_code,
-                'product_code'  => $ro->product_code,
-                'product_name'  => $ro->product_name,
-                'product_style' => $ro->style_code,
-                'cost'  => $ro->cost,
-                'price'  => $ro->price,
-                'sell'  => $sell_price,
-                'qty'   => $orderQty,
-                'discount_label'  => discountLabel($ro->discount1, $ro->discount2, $ro->discount3),
-                'discount_amount' => ($discount_amount * $orderQty),
-                'total_amount'   => ($sell_price * $orderQty),
-                'total_cost'   => ($ro->cost * $orderQty),
-                'margin'  =>  ($sell_price * $orderQty) - ($ro->cost * $orderQty),
-                'id_policy'   => $id_policy,
-                'id_rule'     => $ro->id_rule,
-                'customer_code' => $order->customer_code,
-                'customer_ref' => $order->customer_ref,
-                'sale_code'   => $order->sale_code,
-                'user' => $order->user,
-                'date_add'  => $date_add,
+              $prepare = array(
+                'order_code' => $order->code,
+                'product_code' => $rs->product_code,
                 'zone_code' => $this->zone_code,
-                'warehouse_code'  => $this->warehouse_code,
-                'update_user' => $this->user,
-                'budget_code' => $order->budget_code,
-                'is_count' => 1,
-                'empID' => $order->empID,
-                'empName' => $order->empName,
-                'approver' => $order->approver,
+                'qty' => $orderQty,
+                'user' => $this->user,
                 'order_detail_id' => $ro->id
-                );
+              );
 
-                //--- 3. บันทึกยอดขาย
-                if(! $this->delivery_order_model->sold($arr))
-                {
-                  $sc = FALSE;
-                  $this->error = "Insert sale data failed : {$order->code} : {$ro->product_code}";
-                  break;
-                }
+              if(! $this->prepare_model->add($prepare))
+              {
+                $sc = FALSE;
+                $this->error = "Insert Prepare failed {$order->code} : {$rs->product_code}";
+              }
+            }
 
-                if($sc === TRUE)
-                {
-                  //--- 2. update movement
-                  $arr = array(
-                  'reference' => $order->code,
-                  'warehouse_code' => $this->warehouse_code,
-                  'zone_code' => $this->zone_code,
-                  'product_code' => $ro->product_code,
-                  'move_in' => 0,
-                  'move_out' => $orderQty,
-                  'date_add' => $date_add
-                  );
+            //---- insert Qc
+            if($sc === TRUE)
+            {
+              $qc = array(
+                'order_code' => $order->code,
+                'product_code' => $rs->product_code,
+                'qty' => $orderQty,
+                'box_id' => NULL,
+                'user' => $this->user,
+                'order_detail_id' => $ro->id
+              );
 
-                  if(! $this->movement_model->add($arr))
-                  {
-                    $sc = FALSE;
-                    $this->error = "Insert Movement failed";
-                    break;
-                  }
-                }
-              } //--- end if qty > 0
-            } //--- end foreach $ds
-          }
-          else
-          {
-            $sc = FALSE;
-            $this->error = "Invalid SKU : {$rs->product_code}";
-            break;
-          }
-        }
-        else
-        {
-          $sc = FALSE;
-          $this->error = "Update failed : No Item Code '{$rs->product_code}' In Order List";
-          break;
-        }
+              if(!$this->qc_model->add($qc))
+              {
+                $sc = FALSE;
+                $this->error = "Insert Qc data failed : {$order->code} : {$rs->product_code}";
+              }
+            }
+
+            $sell_price = ($ro->qty > 0) ? round($ro->total_amount/$ro->qty, 2) : $ro->price;
+            $discount_amount = ($ro->qty > 0) ? round($ro->discount_amount/$ro->qty, 2) : 0;
+            $id_policy = empty($ro->id_rule) ? NULL : $this->discount_rule_model->get_policy_id($ro->id_rule);
+
+            //--- ข้อมูลสำหรับบันทึกยอดขาย
+            $arr = array(
+            'reference' => $order->code,
+            'role' => $order->role,
+            'payment_code'   => $order->payment_code,
+            'channels_code'  => $order->channels_code,
+            'product_code'  => $ro->product_code,
+            'product_name'  => $ro->product_name,
+            'product_style' => $ro->style_code,
+            'cost'  => $ro->cost,
+            'price'  => $ro->price,
+            'sell'  => $sell_price,
+            'qty'   => $orderQty,
+            'discount_label'  => discountLabel($ro->discount1, $ro->discount2, $ro->discount3),
+            'discount_amount' => ($discount_amount * $orderQty),
+            'total_amount'   => ($sell_price * $orderQty),
+            'total_cost'   => ($ro->cost * $orderQty),
+            'margin'  =>  ($sell_price * $orderQty) - ($ro->cost * $orderQty),
+            'id_policy'   => $id_policy,
+            'id_rule'     => $ro->id_rule,
+            'customer_code' => $order->customer_code,
+            'customer_ref' => $order->customer_ref,
+            'sale_code'   => $order->sale_code,
+            'user' => $order->user,
+            'date_add'  => $date_add,
+            'zone_code' => $this->zone_code,
+            'warehouse_code'  => $this->warehouse_code,
+            'update_user' => $this->user,
+            'budget_code' => $order->budget_code,
+            'is_count' => 1,
+            'empID' => $order->empID,
+            'empName' => $order->empName,
+            'approver' => $order->approver,
+            'order_detail_id' => $ro->id
+            );
+
+            //--- 3. บันทึกยอดขาย
+            if(! $this->delivery_order_model->sold($arr))
+            {
+              $sc = FALSE;
+              $this->error = "Insert sale data failed : {$order->code} : {$ro->product_code}";
+              break;
+            }
+
+            if($sc === TRUE)
+            {
+              //--- 2. update movement
+              $arr = array(
+              'reference' => $order->code,
+              'warehouse_code' => $this->warehouse_code,
+              'zone_code' => $this->zone_code,
+              'product_code' => $ro->product_code,
+              'move_in' => 0,
+              'move_out' => $orderQty,
+              'date_add' => $date_add
+              );
+
+              if(! $this->movement_model->add($arr))
+              {
+                $sc = FALSE;
+                $this->error = "Insert Movement failed";
+                break;
+              }
+            }
+          } //--- end if qty > 0
+        } //--- end foreach $ds
 
         //------ ส่วนนี้สำหรับโอนเข้าคลังระหว่างทำ
         //------ หากเป็นออเดอร์เบิกแปรสภาพ
