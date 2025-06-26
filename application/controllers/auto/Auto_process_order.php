@@ -21,6 +21,7 @@ class Auto_process_order extends CI_Controller
 		$this->zone_code = getConfig('DEFAULT_ZONE'); //--- โซน เริ่มต้น
     $this->warehouse_code = getConfig('DEFAULT_WAREHOUSE');
 
+    $this->load->model('inventory/delivery_order_model');
 		$this->load->model('orders/orders_model');
     $this->load->model('orders/order_state_model');
 		$this->load->model('inventory/prepare_model');
