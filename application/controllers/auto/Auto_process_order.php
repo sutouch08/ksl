@@ -12,11 +12,14 @@ class Auto_process_order extends CI_Controller
   public $menu_code = NULL;
   public $menu_group_code = NULL;
   public $pm;
+  public $ms;
+  public $mc;
 
   public function __construct()
   {
     parent::__construct();
-
+    $this->load->database('ms', TRUE);
+    $this->load->database('mc', TRUE);
     $this->home = base_url().'auto/auto_process_order';
 		$this->zone_code = getConfig('DEFAULT_ZONE'); //--- โซน เริ่มต้น
     $this->warehouse_code = getConfig('DEFAULT_WAREHOUSE');
@@ -30,7 +33,6 @@ class Auto_process_order extends CI_Controller
 		$this->load->model('inventory/qc_model');
     $this->load->model('inventory/movement_model');
     $this->load->model('masters/products_model');
-    $this->load->helper('discount');    
     $this->load->helper('discount');
 
 		$this->user = 'api@warrix';
