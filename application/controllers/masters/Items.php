@@ -194,7 +194,7 @@ class Items extends PS_Controller
               $rs['D'] = str_replace(array("\n", "\r"), '', $rs['D']); //--- เอาตัวขึ้นบรรทัดใหม่ออก
 
               $style = preg_replace($code_pattern, '', get_null(trim($rs['D'])));
-              $old_style = NULL; //get_null(trim($rs['T'])) === NULL ? $style : trim($rs['T']);
+              $old_style = get_null(trim($rs['U']);
               $color_code = get_null(trim($rs['E']));
               $size_code = get_null(trim($rs['F']));
               $group_code = get_null(trim($rs['G']));
@@ -298,7 +298,7 @@ class Items extends PS_Controller
 
               $rs['A'] = str_replace(array("\n", "\r"), '', $rs['A']); //--- เอาตัวขึ้นบรรทัดใหม่ออก
               $code = preg_replace($code_pattern, '', trim($rs['A']));
-              $old_code = NULL; //get_null(trim($rs['U'])) === NULL ? $code : trim($rs['U']);
+              $old_code = get_null(trim($rs['V']));
               $arr = array(
                 'code' => $code,
                 'name' => trim($rs['B']),

@@ -104,8 +104,7 @@ class Temp_delivery_model extends CI_Model
         ->group_start()
         ->where('F_Sap IS NULL', NULL, FALSE)
         ->or_where('F_Sap', 'P')
-        ->group_end();
-        //$this->mc->where('F_Sap IS NULL', NULL, FALSE);
+        ->group_end();        
       }
       else if($ds['status'] === 'E')
       {
@@ -129,7 +128,6 @@ class Temp_delivery_model extends CI_Model
 
     return NULL;
   }
-
 
 
   public function get_detail($docEntry)
@@ -167,22 +165,6 @@ class Temp_delivery_model extends CI_Model
 
     return NULL;
   }
-
-  // public function get_error_list()
-  // {
-  //   $rs = $this->mc
-  //   ->select('DocEntry, U_ECOMNO AS code')
-  //   ->where('F_Sap', 'N')
-  //   ->order_by('U_ECOMNO', 'ASC')
-  //   ->get('ODLN');
-  //
-  //   if($rs->num_rows() > 0)
-  //   {
-  //     return $rs->result();
-  //   }
-  //
-  //   return NULL;
-  // }
 
 
   public function get_stock_zone($zone_code, array $item_list = array())
