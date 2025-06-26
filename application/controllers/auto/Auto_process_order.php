@@ -26,8 +26,13 @@ class Auto_process_order extends CI_Controller
     $this->load->model('orders/order_state_model');
 		$this->load->model('inventory/prepare_model');
 		$this->load->model('inventory/buffer_model');
+    $this->load->model('inventory/cancle_model');
 		$this->load->model('inventory/qc_model');
+    $this->load->model('inventory/movement_model');
+    $this->load->model('masters/products_model');
+    $this->load->helper('discount');    
     $this->load->helper('discount');
+
 		$this->user = 'api@warrix';
     $this->pm = new stdClass();
     $this->pm->can_view = 1;
