@@ -75,6 +75,14 @@ class Auto_process_order extends CI_Controller
       set_error('notfound');
     }
 
+    $details = $this->orders_model->get_order_details($code);
+
+    if(empty($details))
+    {
+      $sc = FALSE;
+      $this->error = "Order items not found";
+    }
+
     if($sc === TRUE)
     {
       if($order->role == 'T' OR $order->role == 'Q')
