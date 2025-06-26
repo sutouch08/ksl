@@ -122,82 +122,77 @@ class Auto_process_order extends CI_Controller
       foreach($details as $rs)
       {
 
-        if($sc === FALSE)
+        if($sc === FALSE){ break; }
+
+        if($rs->is_count)
         {
-          break;
+
         }
 
-        $qty = $rs->qty;
-
-        foreach($ds as $ro)
+        if($rs->is_count)
         {
-          if($qty > 0)
+          //--- insert prepare
+          if($sc === TRUE)
           {
-            $orderQty = $qty >= $ro->qty ? $ro->qty : $qty;
-            $qty = $qty - $orderQty;
+            $prepare = array(
+              'order_code' => $order->code,
+              'product_code' => $rs->product_code,
+              'zone_code' => $this->zone_code,
+              'qty' => $rs->qty,
+              'user' => $this->user,
+              'order_detail_id' => $rs->id
+            );
 
-            //--- add prepare
-            if($sc === TRUE)
+            if(! $this->prepare_model->add($prepare))
             {
-              $prepare = array(
-                'order_code' => $order->code,
-                'product_code' => $rs->product_code,
-                'zone_code' => $this->zone_code,
-                'qty' => $orderQty,
-                'user' => $this->user,
-                'order_detail_id' => $ro->id
-              );
-
-              if(! $this->prepare_model->add($prepare))
-              {
-                $sc = FALSE;
-                $this->error = "Insert Prepare failed {$order->code} : {$rs->product_code}";
-              }
+              $sc = FALSE;
+              $this->error = "Insert Prepare failed {$order->code} : {$rs->product_code}";
             }
+          }
 
-            //---- insert Qc
-            if($sc === TRUE)
+          //---- insert Qc
+          if($sc === TRUE)
+          {
+            $qc = array(
+              'order_code' => $order->code,
+              'product_code' => $rs->product_code,
+              'qty' => $rs->qty,
+              'box_id' => NULL,
+              'user' => $this->user,
+              'order_detail_id' => $rs->id
+            );
+
+            if(!$this->qc_model->add($qc))
             {
-              $qc = array(
-                'order_code' => $order->code,
-                'product_code' => $rs->product_code,
-                'qty' => $orderQty,
-                'box_id' => NULL,
-                'user' => $this->user,
-                'order_detail_id' => $ro->id
-              );
-
-              if(!$this->qc_model->add($qc))
-              {
-                $sc = FALSE;
-                $this->error = "Insert Qc data failed : {$order->code} : {$rs->product_code}";
-              }
+              $sc = FALSE;
+              $this->error = "Insert Qc data failed : {$order->code} : {$rs->product_code}";
             }
+          }
 
-            $sell_price = ($ro->qty > 0) ? round($ro->total_amount/$ro->qty, 2) : $ro->price;
-            $discount_amount = ($ro->qty > 0) ? round($ro->discount_amount/$ro->qty, 2) : 0;
-            $id_policy = empty($ro->id_rule) ? NULL : $this->discount_rule_model->get_policy_id($ro->id_rule);
+          $sell_price = ($rs->qty > 0) ? round($rs->total_amount/$rs->qty, 2) : $rs->price;
+          $discount_amount = ($rs->qty > 0) ? round($rs->discount_amount/$rs->qty, 2) : 0;
+          $id_policy = empty($rs->id_rule) ? NULL : $this->discount_rule_model->get_policy_id($rs->id_rule);
 
-            //--- ข้อมูลสำหรับบันทึกยอดขาย
-            $arr = array(
+          //--- ข้อมูลสำหรับบันทึกยอดขาย
+          $arr = array(
             'reference' => $order->code,
             'role' => $order->role,
             'payment_code'   => $order->payment_code,
             'channels_code'  => $order->channels_code,
-            'product_code'  => $ro->product_code,
-            'product_name'  => $ro->product_name,
-            'product_style' => $ro->style_code,
-            'cost'  => $ro->cost,
-            'price'  => $ro->price,
+            'product_code'  => $rs->product_code,
+            'product_name'  => $rs->product_name,
+            'product_style' => $rs->style_code,
+            'cost'  => $rs->cost,
+            'price'  => $rs->price,
             'sell'  => $sell_price,
             'qty'   => $orderQty,
-            'discount_label'  => discountLabel($ro->discount1, $ro->discount2, $ro->discount3),
+            'discount_label'  => discountLabel($rs->discount1, $rs->discount2, $rs->discount3),
             'discount_amount' => ($discount_amount * $orderQty),
             'total_amount'   => ($sell_price * $orderQty),
-            'total_cost'   => ($ro->cost * $orderQty),
-            'margin'  =>  ($sell_price * $orderQty) - ($ro->cost * $orderQty),
+            'total_cost'   => ($rs->cost * $orderQty),
+            'margin'  =>  ($sell_price * $orderQty) - ($rs->cost * $orderQty),
             'id_policy'   => $id_policy,
-            'id_rule'     => $ro->id_rule,
+            'id_rule'     => $rs->id_rule,
             'customer_code' => $order->customer_code,
             'customer_ref' => $order->customer_ref,
             'sale_code'   => $order->sale_code,
@@ -211,39 +206,38 @@ class Auto_process_order extends CI_Controller
             'empID' => $order->empID,
             'empName' => $order->empName,
             'approver' => $order->approver,
-            'order_detail_id' => $ro->id
-            );
+            'order_detail_id' => $rs->id
+          );
 
-            //--- 3. บันทึกยอดขาย
-            if(! $this->delivery_order_model->sold($arr))
-            {
-              $sc = FALSE;
-              $this->error = "Insert sale data failed : {$order->code} : {$ro->product_code}";
-              break;
-            }
+          //--- 3. บันทึกยอดขาย
+          if(! $this->delivery_order_model->sold($arr))
+          {
+            $sc = FALSE;
+            $this->error = "Insert sale data failed : {$order->code} : {$rs->product_code}";
+            break;
+          }
 
-            if($sc === TRUE)
-            {
-              //--- 2. update movement
-              $arr = array(
+          if($sc === TRUE)
+          {
+            //--- 2. update movement
+            $arr = array(
               'reference' => $order->code,
               'warehouse_code' => $this->warehouse_code,
               'zone_code' => $this->zone_code,
-              'product_code' => $ro->product_code,
+              'product_code' => $rs->product_code,
               'move_in' => 0,
               'move_out' => $orderQty,
               'date_add' => $date_add
-              );
+            );
 
-              if(! $this->movement_model->add($arr))
-              {
-                $sc = FALSE;
-                $this->error = "Insert Movement failed";
-                break;
-              }
+            if(! $this->movement_model->add($arr))
+            {
+              $sc = FALSE;
+              $this->error = "Insert Movement failed";
+              break;
             }
-          } //--- end if qty > 0
-        } //--- end foreach $ds
+          }
+        } //-- if is_count
 
         //------ ส่วนนี้สำหรับโอนเข้าคลังระหว่างทำ
         //------ หากเป็นออเดอร์เบิกแปรสภาพ
@@ -252,38 +246,32 @@ class Auto_process_order extends CI_Controller
           //--- ตัวเลขที่มีการเปิดบิล
           $sold_qty = $rs->qty;
 
-          if( ! empty($ds))
+          //--- ยอดสินค้าที่มีการเชื่อมโยงไว้ในตาราง tbl_order_transform_detail (เอาไว้โอนเข้าคลังระหว่างทำ รอรับเข้า)
+          //--- ถ้ามีการเชื่อมโยงไว้ ยอดต้องมากกว่า 0 ถ้ายอดเป็น 0 แสดงว่าไม่ได้เชื่อมโยงไว้
+          $trans_list = $this->transform_model->get_transform_product($rs->id);
+
+          if( ! empty($trans_list))
           {
-            foreach($ds as $ro)
+            //--- ถ้าไม่มีการเชื่อมโยงไว้
+            foreach($trans_list as $ts)
             {
-              //--- ยอดสินค้าที่มีการเชื่อมโยงไว้ในตาราง tbl_order_transform_detail (เอาไว้โอนเข้าคลังระหว่างทำ รอรับเข้า)
-              //--- ถ้ามีการเชื่อมโยงไว้ ยอดต้องมากกว่า 0 ถ้ายอดเป็น 0 แสดงว่าไม่ได้เชื่อมโยงไว้
-              $trans_list = $this->transform_model->get_transform_product($ro->id);
+              //--- ถ้าจำนวนที่เชื่อมโยงไว้ น้อยกว่า หรือ เท่ากับ จำนวนที่ตรวจได้ (ไม่เกินที่สั่งไป)
+              //--- แสดงว่าได้ของครบตามที่ผูกไว้ ให้ใช้ตัวเลขที่ผูกไว้ได้เลย
+              //--- แต่ถ้าได้จำนวนที่ผูกไว้มากกว่าที่ตรวจได้ แสดงว่า ได้สินค้าไม่ครบ ให้ใช้จำนวนที่ตรวจได้แทน
+              $move_qty = $ts->order_qty <= $sold_qty ? $ts->order_qty : $sold_qty;
 
-              if(!empty($trans_list))
+              if( $move_qty > 0)
               {
-                //--- ถ้าไม่มีการเชื่อมโยงไว้
-                foreach($trans_list as $ts)
+                //--- update ยอดเปิดบิลใน tbl_order_transform_detail field sold_qty
+                if($this->transform_model->update_sold_qty($ts->id, $move_qty))
                 {
-                  //--- ถ้าจำนวนที่เชื่อมโยงไว้ น้อยกว่า หรือ เท่ากับ จำนวนที่ตรวจได้ (ไม่เกินที่สั่งไป)
-                  //--- แสดงว่าได้ของครบตามที่ผูกไว้ ให้ใช้ตัวเลขที่ผูกไว้ได้เลย
-                  //--- แต่ถ้าได้จำนวนที่ผูกไว้มากกว่าที่ตรวจได้ แสดงว่า ได้สินค้าไม่ครบ ให้ใช้จำนวนที่ตรวจได้แทน
-                  $move_qty = $ts->order_qty <= $sold_qty ? $ts->order_qty : $sold_qty;
-
-                  if( $move_qty > 0)
-                  {
-                    //--- update ยอดเปิดบิลใน tbl_order_transform_detail field sold_qty
-                    if($this->transform_model->update_sold_qty($ts->id, $move_qty))
-                    {
-                      $sold_qty -= $move_qty;
-                    }
-                    else
-                    {
-                      $sc = FALSE;
-                      $this->error = 'ปรับปรุงยอดรายการค้างรับไม่สำเร็จ';
-                      break;
-                    }
-                  }
+                  $sold_qty -= $move_qty;
+                }
+                else
+                {
+                  $sc = FALSE;
+                  $this->error = 'ปรับปรุงยอดรายการค้างรับไม่สำเร็จ';
+                  break;
                 }
               }
             }
@@ -297,11 +285,11 @@ class Auto_process_order extends CI_Controller
           $sold_qty = $rs->qty;
 
           $arr = array(
-          'order_code' => $order->code,
-          'product_code' => $ds->product_code,
-          'product_name' => $ds->product_name,
-          'qty' => $sold_qty,
-          'empID' => $order->empID
+            'order_code' => $order->code,
+            'product_code' => $rs->product_code,
+            'product_name' => $rs->product_name,
+            'qty' => $sold_qty,
+            'empID' => $order->empID
           );
 
           if($this->lend_model->add_detail($arr) === FALSE)
@@ -310,7 +298,7 @@ class Auto_process_order extends CI_Controller
             $this->error = 'เพิ่มรายการค้างรับไม่สำเร็จ';
           }
         }
-      } //---- end count detaail
+      } //end foreach
 
 
       $uncount_details = $this->orders_model->get_order_uncount_details($order->code);
