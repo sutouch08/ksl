@@ -374,10 +374,12 @@ class Auto_process_order extends CI_Controller
       if($sc === TRUE)
       {
         $this->db->trans_commit();
+        $this->update_status($order->code, 1, NULL);
       }
       else
       {
         $this->db->trans_rollback();
+        $this->update_status($order->code, 3, $this->error);
       }
 
       if($sc === TRUE)
@@ -397,7 +399,6 @@ class Auto_process_order extends CI_Controller
 
   private function update_status($code, $status = 1, $message = NULL)
 	{
-
     $arr = array(
       'status' => $status,
       'message' => $message
