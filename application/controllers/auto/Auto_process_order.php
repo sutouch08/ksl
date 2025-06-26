@@ -26,6 +26,7 @@ class Auto_process_order extends CI_Controller
 		$this->load->model('inventory/prepare_model');
 		$this->load->model('inventory/buffer_model');
 		$this->load->model('inventory/qc_model');
+    $this->load->helper('discount');
 		$this->user = 'api@warrix';
     $this->pm = new stdClass();
     $this->pm->can_view = 1;
@@ -185,12 +186,12 @@ class Auto_process_order extends CI_Controller
             'cost'  => $rs->cost,
             'price'  => $rs->price,
             'sell'  => $sell_price,
-            'qty'   => $orderQty,
+            'qty'   => $rs->qty,
             'discount_label'  => discountLabel($rs->discount1, $rs->discount2, $rs->discount3),
-            'discount_amount' => ($discount_amount * $orderQty),
-            'total_amount'   => ($sell_price * $orderQty),
-            'total_cost'   => ($rs->cost * $orderQty),
-            'margin'  =>  ($sell_price * $orderQty) - ($rs->cost * $orderQty),
+            'discount_amount' => ($discount_amount * $rs->qty),
+            'total_amount'   => ($sell_price * $rs->qty),
+            'total_cost'   => ($rs->cost * $rs->qty),
+            'margin'  =>  ($sell_price * $rs->qty) - ($rs->cost * $rs->qty),
             'id_policy'   => $id_policy,
             'id_rule'     => $rs->id_rule,
             'customer_code' => $order->customer_code,
@@ -226,7 +227,7 @@ class Auto_process_order extends CI_Controller
               'zone_code' => $this->zone_code,
               'product_code' => $rs->product_code,
               'move_in' => 0,
-              'move_out' => $orderQty,
+              'move_out' => $rs->qty,
               'date_add' => $date_add
             );
 
