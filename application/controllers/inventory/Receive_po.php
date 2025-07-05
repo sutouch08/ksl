@@ -974,7 +974,7 @@ class Receive_po extends PS_Controller
                   else
                   {
                     $sc = FALSE;
-                    $this->error = 'ไม่พบรหัสสินค้า : '.$item.' ในระบบ';
+                    $this->error = 'ไม่พบรหัสสินค้า : '.$rs->product_code.' ในระบบ';
                   }
                 } //--- end if qty != 0
               } //-- end foreach
