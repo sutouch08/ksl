@@ -601,7 +601,7 @@ class Import_order extends CI_Controller
 
       $sokoWh = getConfig('SOKOJUNG_WAREHOUSE');
 
-      $default_warehouse = getConfig('WEB_SITE_WAREHOUSE_CODE');
+      $default_warehouse = getConfig('DEFAULT_WAREHOUSE');
       //---- กำหนดช่องทางขายสำหรับเว็บไซต์ เพราะมีลูกค้าแยกตามช่องทางการชำระเงินอีกที
       //---- เลยต้องกำหนดลูกค้าแยกตามช่องทางการชำระเงินต่างๆ สำหรับเว็บไซต์เท่านั้น
       //---- เพราะช่องทางอื่นๆในการนำเข้าจะใช้ช่องทางการชำระเงินแบบเดียวทั้งหมด
@@ -1015,7 +1015,7 @@ class Import_order extends CI_Controller
                   'warehouse_code' => $warehouse_code,
                   'user' => $this->_user->uname,
                   'is_import' => 1,
-                  'remark' => $remark,                  
+                  'remark' => $remark,
                   'id_address' => $id_address,
                   'id_sender' => empty(trim($rs['W'])) ? NULL : $this->sender_model->get_id(trim($rs['W'])),
                   'force_update' => $rs['S'] == 1 ? TRUE : FALSE,

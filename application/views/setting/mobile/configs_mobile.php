@@ -8,11 +8,14 @@
 
 <div class="row">
 	<div class="setting-menu">
+		<?php if($cando) : ?>
+			<div class="menu-block">
+				<a class="menu-link" href="javascript:goSetting('system')">System <i class="fa fa-angle-right pull-right font-size-20"></i></a>
+			</div>
+		<?php endif; ?>
+
 		<div class="menu-block">
 			<a class="menu-link" href="javascript:goSetting('general')">General <i class="fa fa-angle-right pull-right font-size-20"></i></a>
-		</div>
-		<div class="menu-block">
-			<a class="menu-link" href="javascript:goSetting('system')">System <i class="fa fa-angle-right pull-right font-size-20"></i></a>
 		</div>
 		<div class="menu-block">
 			<a class="menu-link" href="javascript:goSetting('inventory')">Inventory <i class="fa fa-angle-right pull-right font-size-20"></i></a>
@@ -43,15 +46,33 @@
 <div class="setting-panel move-out" id="general">
 	<?php $this->load->view('setting/mobile/setting_company_mobile'); ?>
 </div>
-
 <div class="setting-panel move-out" id="system">
 	<?php $this->load->view('setting/mobile/setting_system_mobile'); ?>
 </div>
-
+<div class="setting-panel move-out" id="inventory">
+	<?php $this->load->view('setting/mobile/setting_inventory_mobile'); ?>
+</div>
 <div class="setting-panel move-out" id="order">
 	<?php $this->load->view('setting/mobile/setting_order_mobile'); ?>
 </div>
-
+<div class="setting-panel move-out" id="bookcode">
+	<?php $this->load->view('setting/mobile/setting_bookcode_mobile'); ?>
+</div>
+<div class="setting-panel move-out" id="wrx">
+	<?php $this->load->view('setting/mobile/setting_wrx_api_mobile'); ?>
+</div>
+<div class="setting-panel move-out" id="SAP">
+	<?php $this->load->view('setting/mobile/setting_sap_mobile'); ?>
+</div>
+<div class="setting-panel move-out" id="ix">
+	<?php $this->load->view('setting/mobile/setting_ix_api_mobile'); ?>
+</div>
+<div class="setting-panel move-out" id="wrx">
+	<?php $this->load->view('setting/mobile/setting_wrx_api_mobile'); ?>
+</div>
+<div class="setting-panel move-out" id="lnw">
+	<?php $this->load->view('setting/mobile/setting_lnw_shop_api_mobile'); ?>
+</div>
 
 <script src="<?php echo base_url(); ?>scripts/setting/setting_mobile.js?v=<?php echo date('Ymd'); ?>"></script>
 <script src="<?php echo base_url(); ?>scripts/setting/setting_document.js?v=<?php echo date('Ymd'); ?>"></script>

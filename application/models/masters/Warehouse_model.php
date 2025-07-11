@@ -237,6 +237,23 @@ class Warehouse_model extends CI_Model
     return NULL;
   }
 
+
+  public function get_transform_warehouse_list()
+  {
+    $rs = $this->db
+    ->where('role', 7)
+    ->where('active', 1)
+    ->order_by('position', 'ASC')
+    ->get('warehouse');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
   //--- เอาเฉพาะคลังที่สามารถยืมสินค้าได้
   public function get_lend_warehouse_list()
   {

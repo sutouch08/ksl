@@ -17,7 +17,7 @@ li {
   margin-bottom: 5px;
 }
 
-.menu-link {
+a.menu-link {
   text-decoration: none;
   position: relative;
   display: block;
