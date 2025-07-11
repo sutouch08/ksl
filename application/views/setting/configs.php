@@ -30,6 +30,7 @@
 		$tab12 = $tab == 'web' ? 'active in' : '';
 		$tab13 = $tab == 'ix' ? 'active in' : '';
 		$tab14 = $tab == 'wrx' ? 'active in' : '';
+		$tab15 = $tab == 'lnw' ? 'active in' : '';
 
 		?>
 		<ul id="myTab1" class="setting-tabs" style="margin-left:0;">
@@ -46,9 +47,10 @@
 			<li class="li-block <?php echo $tab11; ?>" onclick="changeURL('chatbot')"><a href="#chatbot" data-toggle="tab">ข้อมูล CHATBOT</a></li>
 		<?php endif; ?>
 			<li class="li-block <?php echo $tab10; ?>" onclick="changeURL('sokojung')"><a href="#sokojung" data-toggle="tab">ข้อมูล SOKOJUNG</a></li>
-			<li class="li-block <?php echo $tab12; ?>" onclick="changeURL('web')"><a href="#web" data-toggle="tab">ข้อมูล Magento</a></li>
-			<li class="li-block <?php echo $tab13; ?>" onclick="changeURL('ix')"><a href="#ix" data-toggle="tab">ข้อมูล IX API</a></li>
-			<li class="li-block <?php echo $tab14; ?>" onclick="changeURL('wrx')"><a href="#wrx" data-toggle="tab">ข้อมูล WRX API</a></li>
+			<li class="li-block <?php echo $tab12; ?>" onclick="changeURL('web')"><a href="#web" data-toggle="tab">Magento API</a></li>
+			<li class="li-block <?php echo $tab13; ?>" onclick="changeURL('ix')"><a href="#ix" data-toggle="tab">IX API</a></li>
+			<li class="li-block <?php echo $tab14; ?>" onclick="changeURL('wrx')"><a href="#wrx" data-toggle="tab">WRX API</a></li>
+			<li class="li-block <?php echo $tab15; ?>" onclick="changeURL('lnw')"><a href="#lnw" data-toggle="tab">LNW SHOP API</a></li>
 
 		</ul>
 	</div>
@@ -101,6 +103,10 @@
 
 			<div class="tab-pane fade <?php echo $tab14; ?>" id="wrx">
 				<?php $this->load->view('setting/setting_wrx_api'); ?>
+			</div>
+
+			<div class="tab-pane fade <?php echo $tab15; ?>" id="lnw">
+				<?php $this->load->view('setting/setting_lnw_shop_api'); ?>
 			</div>
 
 			<?php if($this->_SuperAdmin) : ?>

@@ -7,6 +7,7 @@ class Configs extends PS_Controller
   public $menu_sub_group_code = 'CONFIG';
 	public $title = 'การกำหนดค่า';
   public $error = '';
+  public $is_mobile = FALSE;
 
   public function __construct()
   {
@@ -15,6 +16,9 @@ class Configs extends PS_Controller
     $this->load->model('setting/config_model');
     $this->load->helper('channels');
     $this->load->helper('warehouse');
+    $this->load->library('user_agent');
+
+    $this->is_mobile = $this->agent->is_mobile();
   }
 
 
@@ -25,6 +29,7 @@ class Configs extends PS_Controller
     $ps = get_permission('SCSYSC');
     $cando = ($ps->can_add + $ps->can_edit + $ps->can_delete) > 0 ? TRUE : FALSE;
     $ds = array();
+
     foreach($groups as $rs)
     {
        $group = $this->config_model->get_config_by_group($rs->code);
@@ -40,7 +45,14 @@ class Configs extends PS_Controller
     $ds['cando'] = $cando;
     $ds['tab'] = $tab;
 
-    $this->load->view('setting/configs', $ds);
+    if($this->is_mobile)
+    {
+      $this->load->view('setting/mobile/configs_mobile', $ds);
+    }
+    else
+    {
+      $this->load->view('setting/configs', $ds);
+    }
   }
 
 
