@@ -2,7 +2,7 @@
 <?php $this->load->view('setting/mobile/style'); ?>
 <div class="row">
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding-5">
-    	<h4 class="title"><?php echo $this->title; ?> Mobile</h4>
+    	<h4 class="title"><?php echo $this->title; ?></h4>
 	</div>
 </div>
 

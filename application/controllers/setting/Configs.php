@@ -14,6 +14,7 @@ class Configs extends PS_Controller
     parent::__construct();
     $this->home = base_url().'setting/configs';
     $this->load->model('setting/config_model');
+    $this->load->helper('customer');
     $this->load->helper('channels');
     $this->load->helper('warehouse');
     $this->load->helper('setting');
@@ -22,9 +23,7 @@ class Configs extends PS_Controller
     $this->is_mobile = $this->agent->is_mobile();
   }
 
-
-
-  public function index($tab = 'general')
+  public function index($tab = 'company')
   {
     $groups = $this->config_model->get_group();
     $ps = get_permission('SCSYSC');

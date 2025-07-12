@@ -34,32 +34,21 @@
 
 		?>
 		<ul id="myTab1" class="setting-tabs" style="margin-left:0;">
-			<li class="li-block <?php echo $tab1; ?>" onclick="changeURL('general')"><a href="#general" data-toggle="tab">ทั่วไป</a></li>
-			<li class="li-block <?php echo $tab2; ?>" onclick="changeURL('company')"><a href="#company" data-toggle="tab">ข้อมูลบริษัท</a></li>
+			<li class="li-block <?php echo $tab2; ?>" onclick="changeURL('company')"><a href="#company" data-toggle="tab">ทั่วไป</a></li>
 			<li class="li-block <?php echo $tab3; ?>" onclick="changeURL('system')"><a href="#system" data-toggle="tab">ระบบ</a></li>
 			<li class="li-block <?php echo $tab4; ?>" onclick="changeURL('inventory')"><a href="#inventory" data-toggle="tab">คลังสินค้า</a></li>
 			<li class="li-block <?php echo $tab5; ?>" onclick="changeURL('order')"><a href="#order" data-toggle="tab">ออเดอร์</a></li>
 			<li class="li-block <?php echo $tab6; ?>" onclick="changeURL('document')"><a href="#document" data-toggle="tab">เลขที่เอกสาร</a></li>
 			<li class="li-block <?php echo $tab7; ?>" onclick="changeURL('bookcode')"><a href="#bookcode" data-toggle="tab">เล่มเอกสาร</a></li>
 			<li class="li-block <?php echo $tab8; ?>" onclick="changeURL('SAP')"><a href="#SAP" data-toggle="tab">ข้อมูล SAP</a></li>
-		<?php if($this->_SuperAdmin) : ?>
-			<li class="li-block <?php echo $tab9; ?>" onclick="changeURL('WMS')"><a href="#WMS" data-toggle="tab">ข้อมูล WMS</a></li>
-			<li class="li-block <?php echo $tab11; ?>" onclick="changeURL('chatbot')"><a href="#chatbot" data-toggle="tab">ข้อมูล CHATBOT</a></li>
-		<?php endif; ?>
-			<li class="li-block <?php echo $tab10; ?>" onclick="changeURL('sokojung')"><a href="#sokojung" data-toggle="tab">ข้อมูล SOKOJUNG</a></li>
-			<li class="li-block <?php echo $tab12; ?>" onclick="changeURL('web')"><a href="#web" data-toggle="tab">Magento API</a></li>
 			<li class="li-block <?php echo $tab13; ?>" onclick="changeURL('ix')"><a href="#ix" data-toggle="tab">IX API</a></li>
-			<li class="li-block <?php echo $tab14; ?>" onclick="changeURL('wrx')"><a href="#wrx" data-toggle="tab">WRX API</a></li>
+			<!-- <li class="li-block <?php echo $tab14; ?>" onclick="changeURL('wrx')"><a href="#wrx" data-toggle="tab">WRX API</a></li> -->
 			<li class="li-block <?php echo $tab15; ?>" onclick="changeURL('lnw')"><a href="#lnw" data-toggle="tab">LNW SHOP API</a></li>
 
 		</ul>
 	</div>
 	<div class="col-lg-10 col-md-10 col-sm-10 border-1" style="padding-top:15px; border-top:0px !important; height:600px; overflow:auto;">
 		<div class="tab-content" style="border:0px;">
-			<!---  ตั้งค่าทั่วไป  ----------------------------------------------------->
-			<div class="tab-pane fade <?php echo $tab1; ?>" id="general">
-				<?php $this->load->view('setting/setting_general'); ?>
-			</div>
 			<!---  ตั้งค่าบริษัท  ------------------------------------------------------>
 			<div class="tab-pane fade <?php echo $tab2; ?>" id="company">
 				<?php $this->load->view('setting/setting_company'); ?>
@@ -88,36 +77,18 @@
 				<?php $this->load->view('setting/setting_sap'); ?>
 			</div>
 
-			<div class="tab-pane fade <?php echo $tab9; ?>" id="WMS">
-				<?php $this->load->view('setting/setting_wms'); ?>
-			</div>
-
-
-			<div class="tab-pane fade <?php echo $tab12; ?>" id="web">
-				<?php $this->load->view('setting/setting_web'); ?>
-			</div>
-
 			<div class="tab-pane fade <?php echo $tab13; ?>" id="ix">
 				<?php $this->load->view('setting/setting_ix_api'); ?>
 			</div>
 
-			<div class="tab-pane fade <?php echo $tab14; ?>" id="wrx">
-				<?php $this->load->view('setting/setting_wrx_api'); ?>
-			</div>
+			<!-- <div class="tab-pane fade <?php echo $tab14; ?>" id="wrx">
+				<?php //$this->load->view('setting/setting_wrx_api'); ?>
+			</div> -->
 
 			<div class="tab-pane fade <?php echo $tab15; ?>" id="lnw">
 				<?php $this->load->view('setting/setting_lnw_shop_api'); ?>
 			</div>
 
-			<?php if($this->_SuperAdmin) : ?>
-				<div class="tab-pane fade <?php echo $tab11; ?>" id="chatbot">
-					<?php $this->load->view('setting/setting_chatbot'); ?>
-				</div>
-
-				<div class="tab-pane fade <?php echo $tab10; ?>" id="sokojung">
-					<?php $this->load->view('setting/setting_sokojung'); ?>
-				</div>
-			<?php endif; ?>
 		</div><!--/ tab-content-->
 	</div><!--/ col-sm-9  -->
 </div><!--/ row  -->

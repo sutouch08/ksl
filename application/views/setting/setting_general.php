@@ -5,8 +5,8 @@
 	?>
 	<form id="generalForm" method="post" action="<?php echo $this->home; ?>/update_config">
     <div class="row">
-			<div class="col-sm-3"><span class="form-control left-label">การแจ้งเตือนเมนูด้านบน</span></div>
-	    <div class="col-sm-9">
+			<div class="col-lg-3 col-md-3 col-sm-3"><span class="form-control left-label">การแจ้งเตือนเมนูด้านบน</span></div>
+	    <div class="col-lg-9 col-md-9 col-sm-9">
 	      <div class="btn-group input-medium">
 	        <button type="button" class="btn btn-sm <?php echo $noti_yes; ?>" style="width:50%;" id="btn-noti-yes" onClick="toggleNotiBars(1)">เปิด</button>
 	        <button type="button" class="btn btn-sm <?php echo $noti_no; ?>" style="width:50%;" id="btn-noti-no" onClick="toggleNotiBars(0)">ปิด</button>

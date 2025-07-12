@@ -1,7 +1,168 @@
-var wms_warehouse = "";
+window.addEventListener('load', () => {
+	defaultZoneInit();
+	ixZoneInit();
+	ixReturnZoneInit();
+	lnwZoneInit();
+	defaultCustomerInit();
+	codCustomerInit();
+	customer2c2pInit();
+})
 
-function updateConfig(formName)
-{
+function toggleOption(el) {
+	let name = el.data('name');
+	let option = el.is(':checked') ? 1 : 0;
+	$("input[name='"+name+"']").val(option);
+	console.log(name+' : ' + $("input[name='"+name+"']").val());
+}
+
+
+function defaultZoneInit() {
+	let whs_code = $('#default-warehouse').val();
+
+	$('#default-zone').autocomplete({
+		source: BASE_URL + 'auto_complete/get_zone_code_and_name/'+ whs_code,
+		autoFocus:true,
+		close:function(){
+			let arr = $(this).val().split(' | ');
+
+			if(arr.length == 2) {
+				$(this).val(arr[0]);
+			}
+			else {
+				$(this).val('');
+			}
+		}
+	})
+}
+
+
+function ixZoneInit() {
+	let whs_code = $('#ix-warehouse').val();
+
+	$('#ix-zone').autocomplete({
+		source: BASE_URL + 'auto_complete/get_zone_code_and_name/'+ whs_code,
+		autoFocus:true,
+		close:function(){
+			let arr = $(this).val().split(' | ');
+
+			if(arr.length == 2) {
+				$(this).val(arr[0]);
+			}
+			else {
+				$(this).val('');
+			}
+		}
+	})
+}
+
+
+function ixReturnZoneInit() {
+	let whs_code = $('#ix-return-warehouse').val();
+
+	$('#ix-return-zone').autocomplete({
+		source: BASE_URL + 'auto_complete/get_zone_code_and_name/'+ whs_code,
+		autoFocus:true,
+		close:function(){
+			let arr = $(this).val().split(' | ');
+
+			if(arr.length == 2) {
+				$(this).val(arr[0]);
+			}
+			else {
+				$(this).val('');
+			}
+		}
+	})
+}
+
+
+function lnwZoneInit() {
+	let whs_code = $('#lnw-warehouse').val();
+
+	$('#lnw-zone').autocomplete({
+		source: BASE_URL + 'auto_complete/get_zone_code_and_name/'+ whs_code,
+		autoFocus:true,
+		close:function(){
+			let arr = $(this).val().split(' | ');
+
+			if(arr.length == 2) {
+				$(this).val(arr[0]);
+			}
+			else {
+				$(this).val('');
+			}
+		}
+	})
+}
+
+
+function defaultCustomerInit() {
+	$('#default-customer-code').autocomplete({
+		source: BASE_URL + 'auto_complete/get_customer_code_and_name',
+		autoFocus:true,
+		close:function() {
+			let arr = $(this).val().split(' | ');
+
+			if(arr.length == 2) {
+				$('#default-customer-code').val(arr[0]);
+				$('#default-customer-name').val(arr[1]);
+			}
+			else {
+				$('#default-customer-code').val('');
+				$('#default-customer-name').val('');
+			}
+		}
+	})
+}
+
+
+function codCustomerInit() {
+	$('#cod-customer-code').autocomplete({
+		source: BASE_URL + 'auto_complete/get_customer_code_and_name',
+		autoFocus:true,
+		close:function() {
+			let arr = $(this).val().split(' | ');
+
+			if(arr.length == 2) {
+				$('#cod-customer-code').val(arr[0]);
+				$('#cod-customer-name').val(arr[1]);
+			}
+			else {
+				$('#cod-customer-code').val('');
+				$('#cod-customer-name').val('');
+			}
+		}
+	})
+}
+
+
+function customer2c2pInit() {
+	$('#2c2p-customer-code').autocomplete({
+		source: BASE_URL + 'auto_complete/get_customer_code_and_name',
+		autoFocus:true,
+		close:function() {
+			let arr = $(this).val().split(' | ');
+
+			if(arr.length == 2) {
+				$('#2c2p-customer-code').val(arr[0]);
+				$('#2c2p-customer-name').val(arr[1]);
+			}
+			else {
+				$('#2c2p-customer-code').val('');
+				$('#2c2p-customer-name').val('');
+			}
+		}
+	})
+}
+
+$('#default-warehouse').select2();
+$('#transform-warehouse').select2();
+$('#lend-warehouse').select2();
+$('#ix-warehouse').select2();
+$('#ix-return-warehouse').select2();
+$('#lnw-shop-warehouse').select2();
+
+function updateConfig(formName) {
 	load_in();
 	var formData = $("#"+formName).serialize();
 	$.ajax({
@@ -9,110 +170,56 @@ function updateConfig(formName)
 		type:"POST",
     cache:"false",
     data: formData,
-		success: function(rs){
+		success: function(rs) {
 			load_out();
+
       rs = $.trim(rs);
+
       if(rs == 'success'){
         swal({
           title:'Updated',
           type:'success',
           timer:1000
         });
-      }else{
-        swal('Error!', rs, 'error');
       }
+			else {
+        showError(rs);
+      }
+		},
+		error:function(rs) {
+			showError();
 		}
 	});
 }
 
-function changeURL(tab)
-{
+
+function changeURL(tab) {
 	var url = BASE_URL + 'setting/configs/index/'+ tab;
 	var stObj = { stage: 'stage' };
 	window.history.pushState(stObj, 'configs', url);
 }
 
 
-
-function openSystem()
-{
-	$("#closed").val(0);
-	$("#btn-close").removeClass('btn-danger');
+function toggleSystem(option) {
+	$('#closed').val(option);
+	$('#btn-open').removeClass('btn-success');
+	$('#btn-close').removeClass('btn-danger');
 	$('#btn-freze').removeClass('btn-warning');
-	$("#btn-open").addClass('btn-success');
-}
 
-
-
-function closeSystem()
-{
-	$("#closed").val(1);
-	$("#btn-open").removeClass('btn-success');
-	$('#btn-freze').removeClass('btn-warning');
-	$("#btn-close").addClass('btn-danger');
-}
-
-
-function frezeSystem()
-{
-	$("#closed").val(2);
-	$("#btn-open").removeClass('btn-success');
-	$("#btn-close").removeClass('btn-danger');
-	$('#btn-freze').addClass('btn-warning');
-}
-
-
-
-function toggleManualCode(option)
-{
-	$('#manual-doc-code').val(option);
-	if(option == 1){
-		$('#btn-manual-yes').addClass('btn-success');
-		$('#btn-manual-no').removeClass('btn-danger');
-		return;
+	if(option == 0) {
+		$("#btn-open").addClass('btn-success');
 	}
-	if(option == 0){
-		$('#btn-manual-yes').removeClass('btn-success');
-		$('#btn-manual-no').addClass('btn-danger');
-		return;
+
+	if(option == 1) {
+		$("#btn-close").addClass('btn-danger');
+	}
+
+	if(option == 2) {
+		$('#btn-freze').addClass('btn-warning');
 	}
 }
 
 
-function toggleUat(option)
-{
-	$('#is-uat').val(option);
-
-	if(option == 1){
-		$('#btn-uat-on').addClass('btn-primary');
-		$('#btn-uat-off').removeClass('btn-success');
-		return;
-	}
-
-	if(option == 0){
-		$('#btn-uat-on').removeClass('btn-primary');
-		$('#btn-uat-off').addClass('btn-success');
-		return;
-	}
-}
-
-
-
-
-function toggleNotiBars(option)
-{
-	$('#noti-bar').val(option);
-	if(option == 1){
-		$('#btn-noti-yes').addClass('btn-success');
-		$('#btn-noti-no').removeClass('btn-danger');
-		return;
-	}
-	if(option == 0){
-		$('#btn-noti-yes').removeClass('btn-success');
-		$('#btn-noti-no').addClass('btn-danger');
-		return;
-	}
-}
 
 
 
@@ -589,20 +696,7 @@ $('#default-warehouse').autocomplete({
 })
 
 
-$('#default-zone').autocomplete({
-	source: BASE_URL + 'auto_complete/get_zone_code_and_name',
-	autoFocus:true,
-	close:function(){
-		let rs = $(this).val();
-		let arr = rs.split(' | ');
 
-		if(arr[0] === 'not found'){
-			$(this).val('');
-		}else{
-			$(this).val(arr[0]);
-		}
-	}
-})
 
 
 $('#lend-warehouse').autocomplete({

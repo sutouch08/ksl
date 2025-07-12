@@ -14,7 +14,6 @@ class Lnw_shop_api
     $this->ci =& get_instance();
 		$this->ci->load->model('rest/V1/lnw_shop_api_logs_model');
     $this->ci->load->model('orders/orders_model');
-    $this->ci->load->model('inventory/qc_model');
 
     $this->api = getWrxApiConfig();
   }
