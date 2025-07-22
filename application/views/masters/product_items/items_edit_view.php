@@ -29,8 +29,33 @@
 		</div>
 
 		<div class="form-group">
+			<label class="col-sm-3 control-label no-padding-right">Alternive Code</label>
+			<div class="col-xs-8 col-sm-3">
+				<input type="text" name="alt_code" id="alt-code" class="width-100" placeholder="Enter Alternive Code.." />
+
+				<div class="col-xs-12 col-sm-12 padding-left-0 padding-right-0 margin-top-10" id="alt-code-table">
+					<?php if( ! empty($alt_codes)) : ?>
+						<?php foreach($alt_codes as $alt) : ?>
+							<?php $uid = genUid(); ?>
+							<label class="btn-block alt-tag" id="alt-label-<?php echo $uid; ?>" data-id="<?php echo $alt->id;?>" style="padding:5px; border:solid 1px #81a87b;">
+								<?php echo $alt->alt_code; ?>
+								<a class="pointer bold pull-right red" onclick="removeAltCode('<?php echo $uid; ?>')" style="margin-left:15px;">
+									<i class="fa fa-times"></i>
+								</a>
+								<input type="hidden" class="alt-code" id="alt-code-<?php echo $uid; ?>" data-id="<?php echo $alt->id; ?>" value="<?php echo $alt->alt_code; ?>" />
+							</label>
+						<?php endforeach; ?>
+					<?php endif; ?>
+				</div>
+			</div>
+			<div class="col-xs-4 col-sm-1 padding-5">
+				<button type="button" class="btn btn-xs btn-primary btn-block" onclick="addAltCode()"><i class="fa fa-plus"></i> Add</button>
+			</div>
+		</div>
+
+		<div class="form-group">
 			<label class="col-sm-3 control-label no-padding-right">ชื่อ</label>
-			<div class="col-xs-12 col-sm-3">
+			<div class="col-xs-12 col-sm-6">
 				<input type="text" name="name" id="name" class="width-100 r" value="<?php echo $name; ?>" required />
 			</div>
 			<div class="help-block col-xs-12 col-sm-reset inline red e" id="name-error"></div>
@@ -262,6 +287,16 @@
 	</div>
 	</form>
 </div><!--/ row  -->
+
+<script id="alt-code-template" type="text/x-handlebarsTemplate">
+	<label class="btn-block alt-tag" id="alt-label-{{uid}}" data-id="" style="padding:5px; border:solid 1px #81a87b;">
+		{{alt_code}}
+		<a class="pointer bold pull-right red" onclick="removeAltCode('{{uid}}')" style="margin-left:15px;">
+			<i class="fa fa-times"></i>
+		</a>
+		<input type="hidden" class="alt-code" id="alt-code-{{uid}}" data-id="" value="{{alt_code}}" />
+	</label>
+</script>
 
 <script src="<?php echo base_url(); ?>scripts/masters/items.js?v=<?php echo date('Ymd'); ?>"></script>
 <?php $this->load->view('include/footer'); ?>

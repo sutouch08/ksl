@@ -29,7 +29,7 @@ class Items extends PS_Controller
     $this->load->model('masters/product_tab_model');
     $this->load->model('masters/product_image_model');
 
-    //---- load helper
+    //---- load helper    
     $this->load->helper('product_tab');
     $this->load->helper('product_brand');
     $this->load->helper('product_tab');
@@ -49,19 +49,19 @@ class Items extends PS_Controller
   public function index()
   {
     $filter = array(
-      'code'      => get_filter('code', 'item_code', ''),
-      'name'      => get_filter('name', 'item_name', ''),
-      'barcode'   => get_filter('barcode', 'item_barcode', ''),
-      'color'     => get_filter('color', 'color' ,''),
-      'size'      => get_filter('size', 'size', ''),
-      'group'     => get_filter('group', 'group', 'all'),
+      'code' => get_filter('code', 'item_code', ''),
+      'name' => get_filter('name', 'item_name', ''),
+      'barcode' => get_filter('barcode', 'item_barcode', ''),
+      'color' => get_filter('color', 'color' ,''),
+      'size' => get_filter('size', 'size', ''),
+      'group' => get_filter('group', 'group', 'all'),
       'sub_group' => get_filter('sub_group', 'sub_group', 'all'),
       'category'  => get_filter('category', 'category', 'all'),
-      'kind'      => get_filter('kind', 'kind', 'all'),
-      'type'      => get_filter('type', 'type', 'all'),
-      'brand'     => get_filter('brand', 'brand', 'all'),
+      'kind' => get_filter('kind', 'kind', 'all'),
+      'type' => get_filter('type', 'type', 'all'),
+      'brand' => get_filter('brand', 'brand', 'all'),
       'collection' => get_filter('collection', 'collection', 'all'),
-      'year'      => get_filter('year', 'year', 'all'),
+      'year' => get_filter('year', 'year', 'all'),
       'active' => get_filter('active', 'active', 'all')
     );
 
@@ -355,7 +355,6 @@ class Items extends PS_Controller
   }
 
 
-
   public function add_new()
   {
     $this->load->view('masters/product_items/items_add_view');
@@ -417,14 +416,6 @@ class Items extends PS_Controller
         else
         {
           $this->do_export($code);
-
-          if($this->sokoApi)
-          {
-            if( ! empty($ds->barcode))
-            {
-              $this->soko_product_api->create_item($ds->code, $ds);
-            }
-          }
         }
       }
     }
@@ -438,13 +429,14 @@ class Items extends PS_Controller
   }
 
 
-
   public function edit($id)
   {
     $item = $this->products_model->get_by_id($id);
 
     if(! empty($item))
     {
+      $item->alt_codes = $this->products_model->get_alt_code($item->code);
+
       $this->load->view('masters/product_items/items_edit_view', $item);
     }
     else
@@ -452,7 +444,6 @@ class Items extends PS_Controller
       $this->page_error();
     }
   }
-
 
 
   public function duplicate($id)
@@ -506,10 +497,29 @@ class Items extends PS_Controller
         'old_code' => get_null($ds->old_code)
       );
 
-      if(! $this->products_model->update($code, $arr))
+      if( ! $this->products_model->update($code, $arr))
       {
   			$sc = FALSE;
   			$this->error = "Update failed";
+      }
+
+      if($sc === TRUE)
+      {
+        if($this->products_model->remove_alt_codes($code))
+        {
+          if( ! empty($ds->alt_codes))
+          {
+            foreach($ds->alt_codes as $alt_code)
+            {
+              $arr = array(
+                'alt_code' => trim($alt_code),
+                'product_code' => $code
+              );
+
+              $this->products_model->add_alt_code($arr);
+            }
+          }
+        }
       }
 		}
 		else
@@ -521,14 +531,6 @@ class Items extends PS_Controller
 		if($sc === TRUE)
 		{
 			$this->do_export($code);
-
-      if($this->sokoApi)
-      {
-        if( ! empty($ds->barcode))
-        {
-          $this->soko_product_api->update_item($ds->code, $ds);
-        }
-      }
 		}
 
 		echo $sc === TRUE ? 'success' : $this->error;

@@ -19,6 +19,11 @@ class Lnw_shop_api
   }
 
 
+  public function get_order_list($from, $to, $limit = 100, $offset = 0)
+  {
+    
+  }
+
 
 } //--- end class
 

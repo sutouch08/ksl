@@ -164,6 +164,7 @@ function update() {
 	data.can_sell = $('#can_sell').is(':checked') ? 1 : 0;
 	data.is_api = $('#is_api').is(':checked') ? 1 : 0;
 	data.active = $('#active').is(':checked') ? 1 : 0;
+  data.alt_codes = [];
 
 	if(data.name.length === 0) {
 		set_error($('#name'), $('#name-error'), "required");
@@ -198,6 +199,12 @@ function update() {
 	if(error > 0) {
 		return false;
 	}
+
+  if($('.alt-code').length) {
+    $('.alt-code').each(function() {
+      data.alt_codes.push($(this).val());
+    })
+  }
 
 	load_in();
 
@@ -379,6 +386,7 @@ $('#style').autocomplete({
   }
 });
 
+
 $('#color').autocomplete({
   source: BASE_URL + 'auto_complete/get_color_code_and_name',
   autoFocus:true,
@@ -465,6 +473,46 @@ function getTemplate(){
 	window.location.href = BASE_URL + 'masters/items/download_template/'+token;
 }
 
+
 function getSearch(){
   $('#searchForm').submit();
+}
+
+
+function addAltCode() {
+  let count = 0;
+  let altCode = $('#alt-code').val().trim();
+
+  if(altCode.length) {
+    if($('.alt-code').length) {
+      $('.alt-code').each(function() {
+        if($(this).val().trim() == altCode) {
+          count++;
+        }
+      })
+    }
+
+    if(count === 0) {
+      let uid = generateUID();
+
+      let ds = {
+        'uid' : uid,
+        'alt_code' : altCode
+      }
+
+      let source = $('#alt-code-template').html();
+      let output = $('#alt-code-table');
+
+      render_append(source, ds, output);
+      $('#alt-code').val('').focus();
+    }
+    else {
+      $('#alt-code').val('').focus();
+    }
+  }
+}
+
+
+function removeAltCode(uid) {
+  $('#alt-label-'+uid).remove();
 }

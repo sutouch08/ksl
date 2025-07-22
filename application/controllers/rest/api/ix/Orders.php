@@ -224,7 +224,16 @@ class Orders extends REST_Controller
       {
         //---- check valid items
         $item = $this->products_model->get($rs->item);
-        $item = empty($item) ? $this->products_model->get_by_old_code($rs->item) : $item;
+
+        if(empty($item))
+        {
+          $item = $this->products_model->get_by_old_code($rs->item);
+        }
+
+        if(empty($item))
+        {
+          $item = $this->products_model->get_by_alt_code($rs->item);
+        }
 
         if(empty($item))
         {
@@ -348,6 +357,7 @@ class Orders extends REST_Controller
           'date_add' => $date_add,
           'doc_date' => $doc_date,
           'due_date' => $due_date,
+          'shipped_date' => $date_add,
           'warehouse_code' => $warehouse_code,
           'is_api' => 1,
           'is_pre_order' => $is_pre_order ? 1 : 0,
@@ -422,6 +432,7 @@ class Orders extends REST_Controller
           'date_add' => $date_add,
           'doc_date' => $doc_date,
           'due_date' => $due_date,
+          'shipped_date' => $date_add,
           'warehouse_code' => $warehouse_code,
           'is_api' => 1,
           'is_pre_order' => $is_pre_order ? 1 : 0,

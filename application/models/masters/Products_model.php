@@ -729,6 +729,23 @@ class Products_model extends CI_Model
   }
 
 
+  public function get_by_alt_code($alt_code)
+  {
+    $rs = $this->db
+    ->select('a.alt_code, p.*')
+    ->from('product_alt_code AS a')
+    ->join('products AS p', 'a.product_code = p.code', 'left')
+    ->where('a.alt_code', $alt_code)
+    ->get();
+
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return NULL;
+  }
+
 
   public function get_name($code)
   {
@@ -825,7 +842,7 @@ class Products_model extends CI_Model
     $rs = $this->db
     ->where('style_code', $style)
     ->where('color_code', $color)
-    ->where('size_code', $size)
+    ->where('size_code', strval($size))
     ->limit(1)
     ->get('products');
 
@@ -1116,17 +1133,10 @@ class Products_model extends CI_Model
 		return NULL;
 	}
 
-  public function get_non_soko_list($limit = 100)
+
+  public function get_alt_code($code)
   {
-    $rs = $this->db
-    ->select('id, code, name, barcode, color_code, size_code, old_code, price')
-    ->where('barcode IS NOT NULL', NULL, FALSE)
-    ->where('barcode !=', '')
-    ->where('count_stock', 1)
-    ->where('soko_code IS NULL', NULL, FALSE)
-    ->order_by('last_sync', 'ASC')
-    ->limit($limit)
-    ->get('products');
+    $rs = $this->db->where('product_code', $code)->get('product_alt_code');
 
     if($rs->num_rows() > 0)
     {
@@ -1134,6 +1144,23 @@ class Products_model extends CI_Model
     }
 
     return NULL;
+  }
+
+
+  public function add_alt_code(array $ds = array())
+  {
+    if( ! empty($ds))
+    {
+      return $this->db->insert('product_alt_code', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+  public function remove_alt_codes($code)
+  {
+    return $this->db->where('product_code', $code)->delete('product_alt_code');
   }
 
 }
