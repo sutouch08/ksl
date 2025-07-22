@@ -4,7 +4,7 @@ class Auto_change_state extends CI_Controller
   public $home;
   public $mc;
   public $ms;
-  public $title = "Auto comfirm order";
+  public $title = "Change state ";
   public $isViewer = FALSE;
   public $notibars = FALSE;
   public $menu_code = NULL;

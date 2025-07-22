@@ -1,12 +1,25 @@
 <?php $this->load->view('include/header'); ?>
 <div class="row">
-  <div class="col-lg-6 col-md-6 col-sm-8 col-xs-8 padding-5">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding-5 padding-top-5">
     <h3 class="title">ออเดอร์ รอย้อนสถานะ <?php echo $count; ?> จากทั้งหมด <?php echo number($all); ?></h3>
   </div>
-  <div class="col-lg-6 col-md-6 col-sm-4 col-xs-4 padding-5">
-    <p class="pull-right top-p">
-      <button type="button" class="btn btn-xs btn-success top-btn" onclick="startExport()">Start Process</button>
-    </p>
+</div>
+<hr/>
+<div class="row">
+  <div class="col-lg-9 col-md-7 col-sm-7 hidden-xs">&nbsp; </div>
+  <div class="col-lg-2 col-md-3-harf col-sm-3-harf col-xs-9 padding-5">
+    <div class="input-group">
+      <span class="input-group-addon">สถานะ</span>
+      <select class="form-control" id="state">
+        <option value="">Select State</option>
+        <option value="1">รอดำเนินการ</option>
+        <option value="3">รอจัดสินค้า</option>
+        <option value="7">รอเปิดบิล</option>
+      </select>
+    </div>
+  </div>
+  <div class="col-lg-1 col-md-1-harf col-sm-1-harf col-xs-3 padding-5">
+    <button type="button" class="btn btn-sm btn-success btn-block" onclick="startExport()">Start</button>
   </div>
 </div>
 <hr/>
@@ -52,9 +65,21 @@
 var finished = false;
 var max = 0;
 var orders = [];
+var state = 7;
 
 function startExport() {
+  let stateSelected = $('#state').val();
+
+  if(stateSelected == "") {
+    swal("กรุณาเลือกสถานะ");
+    return false;
+  }
+  else {
+    state = stateSelected;
+  }
+
   load_in();
+
   max = parseDefault(parseInt($('#count').val()), 0);
 
   $('.order').each(function() {
@@ -82,7 +107,7 @@ function do_export(no){
         cache:false,
         data:{
           'order_code' : code,
-          'state' : 7
+          'state' : state
         },
         success:function(rs){
 
