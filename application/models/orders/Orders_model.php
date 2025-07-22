@@ -1899,6 +1899,7 @@ class Orders_model extends CI_Model
     ->where('is_cancled', 0)
     ->where('is_expired', 0)
     ->where('inv_code IS NULL', NULL, FALSE)
+    ->order_by('last_sync', 'ASC')
     ->limit($limit)
     ->get('orders');
 
