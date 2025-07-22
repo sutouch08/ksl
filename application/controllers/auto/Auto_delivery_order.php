@@ -62,6 +62,7 @@ class Auto_delivery_order extends CI_Controller
     ->where('role', 'S')
     ->where('state', 3)
     ->order_by('last_sync', 'ASC')
+    ->limit($limit)
     ->get('orders');
 
     if($rs->num_rows() > 0)
@@ -383,6 +384,8 @@ class Auto_delivery_order extends CI_Controller
         }
       } //-- ! empty details
     }
+
+    return $sc;
   }
 
 
