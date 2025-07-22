@@ -360,7 +360,12 @@ class Auto_delivery_order extends CI_Controller
 
         if($sc === TRUE)
         {
-          $this->orders_model->update($order->code, array('shipped_date' => $date_add)); //--- update shipped
+          $arr = array(
+            'shipped_date' => $date_add,
+            'last_sync' => now()
+          );
+
+          $this->orders_model->update($order->code, $arr); //--- update shipped
         }
 
         if($sc === TRUE)
