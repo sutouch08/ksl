@@ -44,7 +44,7 @@ class Auto_change_state extends CI_Controller
   public function get_all($limit = 100)
   {
     $rs = $this->db
-    ->select('a.code, o.state')
+    ->select('a.*, o.state')
     ->from('auto_send_to_sap_order AS a')
     ->join('orders AS o', 'a.code = o.code', 'left')
     ->where('a.status !=', 1)

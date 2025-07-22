@@ -23,6 +23,22 @@
   </div>
 </div>
 <hr/>
+
+<?php
+
+  $stateName = array(
+    '1' => 'รอดำเนินการ',
+    '2' => 'รอชำระเงิน',
+    '3' => 'รอจัดสินค้า',
+    '4' => 'กำลังจัด',
+    '5' => 'รอตรวจ',
+    '6' => 'กำลังตรวจ',
+    '7' => 'รอเปิดบิล',
+    '8' => 'เปิดบิลแล้ว',
+    '9' => 'ยกเลิก'
+  );
+
+ ?>
 <div class="row" id="result">
   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding-5 table-responsive">
     <table class="table table-striped border-1" style="min-width:500px;">
@@ -44,7 +60,7 @@
                 <?php echo $rs->code; ?>
                 <input type="hidden" class="order" data-id="<?php echo $rs->id; ?>" data-no="<?php echo $no; ?>" id="code-<?php echo $no; ?>"  value="<?php echo $rs->code; ?>" />
               </td>
-              <td id="status-<?php echo $no; ?>">รอดำเนินการ</td>
+              <td id="status-<?php echo $no; ?>"><?php echo empty($stateName($rs->state)) ? "Unknow" : $stateName($rs->state); ?></td>
               <td id="msg-<?php echo $no; ?>"></td>
             </tr>
             <?php $no++; ?>
