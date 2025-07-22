@@ -24,8 +24,8 @@
 </div>
 <hr/>
 <div class="row" id="result">
-  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding-5">
-    <table class="table table-striped border-1">
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding-5 table-responsive">
+    <table class="table table-striped border-1" style="min-width:500px;">
       <thead>
         <tr>
           <th class="fix-width-40 text-center">#</th>
