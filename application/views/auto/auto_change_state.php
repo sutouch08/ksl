@@ -60,7 +60,7 @@
                 <?php echo $rs->code; ?>
                 <input type="hidden" class="order" data-id="<?php echo $rs->id; ?>" data-no="<?php echo $no; ?>" id="code-<?php echo $no; ?>"  value="<?php echo $rs->code; ?>" />
               </td>
-              <td id="status-<?php echo $no; ?>"><?php echo empty($stateName($rs->state)) ? "Unknow" : $stateName($rs->state); ?></td>
+              <td id="status-<?php echo $no; ?>"><?php echo empty($stateName[$rs->state]) ? "Unknow" : $stateName[$rs->state]; ?></td>
               <td id="msg-<?php echo $no; ?>"></td>
             </tr>
             <?php $no++; ?>
