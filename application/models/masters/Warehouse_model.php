@@ -355,6 +355,21 @@ class Warehouse_model extends CI_Model
 	}
 
 
+  public function get_lend_list()
+  {
+    $rs = $this->db
+    ->where('role', 8)    
+    ->where('active', 1)
+    ->get('warehouse');
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
   public function count_zone($code)
   {
     return $this->db->where('warehouse_code', $code)->count_all_results('zone');

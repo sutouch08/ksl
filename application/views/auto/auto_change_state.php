@@ -15,6 +15,7 @@
         <option value="1">รอดำเนินการ</option>
         <option value="3">รอจัดสินค้า</option>
         <option value="7">รอเปิดบิล</option>
+        <option value="9">ยกเลิก</option>
       </select>
     </div>
   </div>

@@ -58,6 +58,9 @@
 <div class="setting-panel move-out" id="bookcode">
 	<?php $this->load->view('setting/mobile/setting_bookcode_mobile'); ?>
 </div>
+<div class="setting-panel move-out" id="document">
+	<?php $this->load->view('setting/mobile/setting_document_mobile'); ?>
+</div>
 <div class="setting-panel move-out" id="wrx">
 	<?php $this->load->view('setting/mobile/setting_wrx_api_mobile'); ?>
 </div>

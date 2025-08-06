@@ -29,7 +29,7 @@ function select_warehouse($se = 0)
   {
     foreach($options as $rs)
     {
-      $sc .= '<option value="'.$rs->code.'" '.is_selected($se, $rs->code).'>'.$rs->code." : ".$rs->name.'</option>';
+      $sc .= '<option value="'.$rs->code.'" '.is_selected($se, $rs->code).'>'.$rs->code." | ".$rs->name.'</option>';
     }
   }
 
@@ -70,7 +70,7 @@ function select_consignment_warehouse($se = NULL)
 	{
 		foreach($option as $rs)
 		{
-			$sc .= '<option value="'.$rs->code.'" '.is_selected($se, $rs->code).'>'.$rs->name.'</option>';
+			$sc .= '<option value="'.$rs->code.'" '.is_selected($se, $rs->code).'>'.$rs->code.' | '.$rs->name.'</option>';
 		}
 	}
 
@@ -121,7 +121,7 @@ function select_lend_warehouse($se = NULL)
   $sc = "";
   $ci =& get_instance();
   $ci->load->model('masters/warehouse_model');
-  $option = $ci->warehouse_model->get_lend_warehouse_list();
+  $option = $ci->warehouse_model->get_lend_list();
 
   if( ! empty($option))
   {
