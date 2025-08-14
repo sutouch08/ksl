@@ -73,7 +73,12 @@ function getConsign(code)
 
 function export_diff()
 {
-  var token = $('#token').val();
+  $('#ex-code').val($('#code').val().trim());
+  $('#ex-customer').val($('#customer').val().trim());
+  $('#ex-from-date').val($('#fromDate').val());
+  $('#ex-to-date').val($('#toDate').val());
+
+  let token = $('#token').val();
   get_download(token);
   $('#reportForm').submit();
 }

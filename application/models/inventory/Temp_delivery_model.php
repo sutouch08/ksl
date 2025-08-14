@@ -104,7 +104,7 @@ class Temp_delivery_model extends CI_Model
         ->group_start()
         ->where('F_Sap IS NULL', NULL, FALSE)
         ->or_where('F_Sap', 'P')
-        ->group_end();        
+        ->group_end();
       }
       else if($ds['status'] === 'E')
       {
@@ -146,14 +146,35 @@ class Temp_delivery_model extends CI_Model
   }
 
 
-  public function get_error_list()
+  public function get_error_list(array $ds = array())
   {
-    $rs = $this->mc
+    $this->mc
     ->select('DLN1.ItemCode, DLN1.BinCode')
     ->select_sum('DLN1.Quantity', 'Qty')
     ->from('DLN1')
     ->join('ODLN', 'DLN1.DocEntry = ODLN.DocEntry', 'left')
-    ->where('ODLN.F_Sap', 'N')
+    ->where('ODLN.F_Sap', 'N');
+
+    if( ! empty($ds['code']))
+    {
+      $this->mc->like('U_ECOMNO', $ds['code']);
+    }
+
+    if( ! empty($ds['customer']))
+    {
+      $this->mc->group_start();
+      $this->mc->like('CardCode', $ds['customer']);
+      $this->mc->or_like('CardName', $ds['customer']);
+      $this->mc->group_end();
+    }
+
+    if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
+    {
+      $this->mc->where('ODLN.DocDate >=', from_date($ds['from_date']));
+      $this->mc->where('ODLN.DocDate <=', to_date($ds['to_date']));
+    }
+
+    $rs = $this->mc
     ->group_by('DLN1.ItemCode')
     ->group_by('DLN1.BINCode')
     ->get();

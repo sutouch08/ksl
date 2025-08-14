@@ -16,17 +16,17 @@
 <div class="row">
   <div class="col-lg-1 col-md-1-harf col-sm-2 col-xs-6 padding-5">
     <label>เลขที่เอกสาร</label>
-    <input type="text" class="form-control input-sm search" name="code"  value="<?php echo $code; ?>" />
+    <input type="text" class="form-control input-sm search" id="code" name="code"  value="<?php echo $code; ?>" />
   </div>
 
   <div class="col-lg-1 col-md-1-harf col-sm-2 col-xs-6 padding-5">
     <label>ลูกค้า/ผู้เบิก</label>
-    <input type="text" class="form-control input-sm search" name="customer" value="<?php echo $customer; ?>" />
+    <input type="text" class="form-control input-sm search" id="customer" name="customer" value="<?php echo $customer; ?>" />
   </div>
 
   <div class="col-lg-1 col-md-1-harf col-sm-2 col-xs-6 padding-5">
     <label>สถานะ</label>
-    <select class="form-control input-sm" name="status" onchange="getSearch()">
+    <select class="form-control input-sm" id="status" name="status" onchange="getSearch()">
       <option value="all">ทั้งหมด</option>
       <option value="Y" <?php echo is_selected('Y', $status); ?>>เข้าแล้ว</option>
       <option value="N" <?php echo is_selected('N', $status); ?>>ยังไม่เข้า</option>
@@ -156,6 +156,11 @@
 </div>
 <form id="reportForm" method="post" action="<?php echo $this->home; ?>/export_diff">
 	<input type="hidden" id="token" name="token" value="<?php echo uniqid(); ?>">
+	<input type="hidden" id="ex-code" name="code" value="" />
+	<input type="hidden" id="ex-customer" name="customer" value="" />
+	<input type="hidden" id="ex-status" name="status" value="" />
+	<input type="hidden" id="ex-from-date" name="from_date" />
+	<input type="hidden" id="ex-to-date" name="to_date" />
 </form>
 <script src="<?php echo base_url(); ?>scripts/inventory/temp/temp_list.js?v=<?php echo date('YmdH'); ?>"></script>
 

@@ -19,11 +19,11 @@ class Temp_delivery_order extends PS_Controller
   public function index()
   {
     $filter = array(
-      'code'          => get_filter('code', 'temp_code', ''),
-      'customer'      => get_filter('customer', 'temp_customer', ''),
-      'from_date'     => get_filter('from_date', 'temp_from_date', ''),
-      'to_date'       => get_filter('to_date', 'temp_to_date', ''),
-      'status'      => get_filter('status', 'temp_status', 'all')
+      'code' => get_filter('code', 'temp_code', ''),
+      'customer' => get_filter('customer', 'temp_customer', ''),
+      'from_date' => get_filter('from_date', 'temp_from_date', ''),
+      'to_date' => get_filter('to_date', 'temp_to_date', ''),
+      'status' => get_filter('status', 'temp_status', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
@@ -143,8 +143,15 @@ class Temp_delivery_order extends PS_Controller
     $this->excel->getActiveSheet()->setCellValue('C5', 'ItemCode');
     $this->excel->getActiveSheet()->setCellValue('D5', 'onhand - order');
 
+    $filter = array(
+      'code' => $this->input->post('code'),
+      'customer' => $this->input->post('customer'),
+      'from_date' => $this->input->post('from_date'),
+      'to_date' => $this->input->post('to_date')
+    );
+
     $ds = array();
-    $lists = $this->temp_delivery_model->get_error_list();
+    $lists = $this->temp_delivery_model->get_error_list($filter);
     $zones = [];
     $items = [];
     $itemList = [];
