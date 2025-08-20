@@ -118,7 +118,7 @@ $canCancleShipped = ($cn->can_add + $cn->can_edit + $cn->can_delete) > 0 ? TRUE 
             <div class="row">
               <div class="col-lg-4 col-md-4 col-sm-4 col-xs-3-harf padding-5 text-right">เลือกผู้จัดส่ง :</div>
               <div class="col-lg-4 col-md-5 col-sm-5 col-xs-5 padding-5">
-                <select class="form-control input-sm" id="id_sender">
+                <select class="width-100" id="id_sender">
                   <option value="">เลือก</option>
                   <?php echo select_common_sender($order->customer_code, $order->id_sender); //--- sender helper?>
                 </select>
@@ -312,6 +312,8 @@ $canCancleShipped = ($cn->can_add + $cn->can_edit + $cn->can_delete) > 0 ? TRUE 
 </div>
 
 <script>
+$('#id_sender').select2();
+
 function showBacklogs() {
   $('#backlogs-modal').modal('show');
 }
