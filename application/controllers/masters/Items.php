@@ -29,7 +29,7 @@ class Items extends PS_Controller
     $this->load->model('masters/product_tab_model');
     $this->load->model('masters/product_image_model');
 
-    //---- load helper    
+    //---- load helper
     $this->load->helper('product_tab');
     $this->load->helper('product_brand');
     $this->load->helper('product_tab');
@@ -163,7 +163,11 @@ class Items extends PS_Controller
                 'Q' => 'Price',
                 'R' => 'Unit',
                 'S' => 'CountStock',
-                'T' => 'IsAPI'
+                'T' => 'IsAPI',
+                'U' => 'OldModel',
+                'V' => 'OldCode',
+                'W' => 'ApiRate',
+                'X' => 'Active'
               );
 
               foreach($headCol as $col => $field)
@@ -206,6 +210,9 @@ class Items extends PS_Controller
               $brand_code = get_null(trim($rs['M']));
               $collection_code = get_null(trim($rs['N']));
               $year = empty($rs['O']) ? '0000' : trim($rs['O']);
+              $is_api = empty($rs['T']) ? 0 : ((trim($rs['T']) == 'Y' OR trim($rs['T'] == 1)) ? 1 : 0);
+              $api_rate = empty($rs['W']) ? 0 : (floatval(trim($rs['W'])));
+              $api_rate = $api_rate < 0 ? 0 : ($api_rate > 100 ? 100 : $api_rate);
 
               if(!empty($color_code) && ! $this->product_color_model->is_exists($color_code))
               {
@@ -283,7 +290,7 @@ class Items extends PS_Controller
                     'price' => round(trim($rs['Q']), 2),
                     'unit_code' => trim($rs['R']),
                     'count_stock' => trim($rs['S']) === 'N' ? 0:1,
-                    'is_api' => trim($rs['T']) === 'N' ? 0 : 1,
+                    'is_api' => $is_api,                  
                     'update_user' => $this->_user->uname,
                     'old_code' => $old_style
                   );
@@ -319,11 +326,17 @@ class Items extends PS_Controller
                 'price' => round(trim($rs['Q']), 2),
                 'unit_code' => empty(trim($rs['R'])) ? 'PCS' : trim($rs['R']),
                 'count_stock' => trim($rs['S']) === 'N' ? 0:1,
-                'is_api' => trim($rs['T']) === 'N' ? 0 : 1,
+                'is_api' => $is_api,
+                'api_rate' => $api_rate,
                 'update_user' => $this->_user->uname,
                 'old_style' => $old_style,
                 'old_code' => $old_code
               );
+
+              if(isset($rs['X']) && $rs['X'] != '' && ($rs['X'] == 'N' OR $rs['X'] == 'n' OR $rs['X'] == 'Y' OR $rs['X'] == 'y'))
+              {
+                $arr['active'] = $rs['X'] == 'N' ? 0 : 1;
+              }
 
               if($this->products_model->is_exists($code))
               {
@@ -752,6 +765,8 @@ class Items extends PS_Controller
       $this->excel->getActiveSheet()->setCellValue('T1', 'IsAPI');
       $this->excel->getActiveSheet()->setCellValue('U1', 'OldModel');
       $this->excel->getActiveSheet()->setCellValue('V1', 'OldCode');
+      $this->excel->getActiveSheet()->setCellValue('W1', 'ApiRate');
+      $this->excel->getActiveSheet()->setCellValue('X1', 'Active');
 
 
       setToken($token);
