@@ -39,7 +39,7 @@
 			<a class="menu-link" href="javascript:goSetting('wrx')">WRX API <i class="fa fa-angle-right pull-right font-size-20"></i></a>
 		</div>
 		<div class="menu-block">
-			<a class="menu-link" href="javascript:goSetting('lnw')">LNW SHOP API <i class="fa fa-angle-right pull-right font-size-20"></i></a>
+			<a class="menu-link" href="javascript:goSetting('pos')">POS API <i class="fa fa-angle-right pull-right font-size-20"></i></a>
 		</div>
 	</div>
 </div><!--/ row  -->
@@ -73,8 +73,8 @@
 <div class="setting-panel move-out" id="wrx">
 	<?php $this->load->view('setting/mobile/setting_wrx_api_mobile'); ?>
 </div>
-<div class="setting-panel move-out" id="lnw">
-	<?php $this->load->view('setting/mobile/setting_lnw_shop_api_mobile'); ?>
+<div class="setting-panel move-out" id="pos">
+	<?php $this->load->view('setting/mobile/setting_pos_api_mobile'); ?>
 </div>
 
 <script src="<?php echo base_url(); ?>scripts/setting/setting_mobile.js?v=<?php echo date('Ymd'); ?>"></script>
