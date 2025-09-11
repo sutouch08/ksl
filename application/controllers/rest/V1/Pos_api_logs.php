@@ -13,7 +13,7 @@ class Pos_api_logs extends PS_Controller
   {
     parent::__construct();
     $this->home = base_url().'rest/V1/pos_api_logs';
-		$this->logs = $this->load->database('logs', TRUE); //--- Temp database
+		$this->logs = $this->load->database('wms', TRUE); //--- Temp database
   	$this->load->model('rest/V1/pos_api_logs_model');
   }
 
@@ -57,7 +57,7 @@ class Pos_api_logs extends PS_Controller
 	{
 		$ds = $this->pos_api_logs_model->get_api_logs($id);
 
-		$this->load->view('rest/V1/sokojung/api_logs_detail', $ds);
+		$this->load->view('rest/V1/pos/api_logs_detail', $ds);
 	}
 
 	public function clear_filter()

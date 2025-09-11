@@ -24,9 +24,9 @@ class WM extends REST_Controller
     {
       $this->ms = $this->load->database('ms', TRUE);
       $this->mc = $this->load->database('mc', TRUE);
-      $this->logs = $this->load->database('logs', TRUE); //--- api logs database
+      $this->logs = $this->load->database('wms', TRUE); //--- api logs database
       $this->logs_json = is_true(getConfig('POS_LOG_JSON'));
-      $this->user = "pos@warrix.co.th";
+      $this->user = "api@xilnex";
       $this->load->model('account/consign_order_model');
       $this->load->model('inventory/delivery_order_model');
       $this->load->model('inventory/invoice_model');
