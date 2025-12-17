@@ -1,5 +1,5 @@
 <?php
-class Auto_change_state extends CI_Controller
+class Auto_change_state extends PS_Controller
 {
   public $home;
   public $mc;
@@ -7,8 +7,8 @@ class Auto_change_state extends CI_Controller
   public $title = "Change state ";
   public $isViewer = FALSE;
   public $notibars = FALSE;
-  public $menu_code = NULL;
-  public $menu_group_code = NULL;
+  public $menu_code = 'SOATCS';
+  public $menu_group_code = 'SO';
   public $pm;
   public $error;
 
@@ -21,9 +21,7 @@ class Auto_change_state extends CI_Controller
     $this->load->model('inventory/delivery_order_model');
     $this->load->model('orders/orders_model');
     $this->load->model('orders/order_state_model');
-		$this->load->library('export');
-    $this->pm = new stdClass();
-    $this->pm->can_view = 1;
+    $this->load->library('export');
   }
 
   public function index()
@@ -89,5 +87,116 @@ class Auto_change_state extends CI_Controller
     echo $sc === TRUE ? 'success' : $this->error;
 	}
 
+
+  public function import_order()
+  {
+    ini_set('max_execution_time', 1200);
+    ini_set('memory_limit','1000M');
+
+    $sc = TRUE;
+
+    $file = isset( $_FILES['uploadFile'] ) ? $_FILES['uploadFile'] : FALSE;
+    $path = $this->config->item('upload_path').'import_files/';
+    $file	= 'uploadFile';
+    $config = array(   // initial config for upload class
+      "allowed_types" => "xlsx",
+      "upload_path" => $path,
+      "file_name"	=> "import_file",
+      "max_size" => 5120,
+      "overwrite" => TRUE
+    );
+
+    $this->load->library("upload", $config);
+
+    if(! $this->upload->do_upload($file))
+    {
+      $sc = FALSE;
+      $this->error = $this->upload->display_errors();
+    }
+    else
+    {
+      $info = $this->upload->data();
+      $this->load->library('excel');
+      /// read file
+      $excel = PHPExcel_IOFactory::load($info['full_path']);
+      //get only the Cell Collection
+      $collection	= $excel->getActiveSheet()->toArray(NULL, TRUE, TRUE, TRUE);
+
+      if( ! empty($collection))
+      {
+        $i = 1;
+        $j = 0;
+        $ds = [];
+        $ro = [];
+
+        foreach($collection as $rs)
+        {
+          if($i > 1)
+          {
+            $j++;
+            $ro[] = array('code' => trim($rs['A']));
+
+            if($j == 1000)
+            {
+              $j = 0;
+              $ds[] = $ro;
+              $ro = [];
+            }
+          }
+
+          $i++;
+        }
+
+        $ds[] = $ro;
+
+        if( ! empty($ds))
+        {
+          foreach($ds as $rows)
+          {
+            if( ! $this->insert($rows))
+            {
+              $sc = FALSE;
+              $this->error = "Cannot insert data";
+            }
+          }
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "Cannot get data from import file : empty data collection";
+      }
+    }
+
+    $this->_response($sc);
+  }
+
+
+
+  public function insert(array $ds = array())
+  {
+    if( ! empty($ds))
+    {      
+      return $this->db->insert_batch('auto_send_to_sap_order', $ds);
+    }
+
+    return FALSE;
+  }
+
+
+  public function clear_data()
+  {
+    $sc = TRUE;
+
+    $qr = "TRUNCATE TABLE auto_send_to_sap_order";
+
+    if( ! $this->db->query($qr))
+    {
+      $sc = FALSE;
+      $this->error = "Failed to clear data";
+    }
+
+    $this->_response($sc);
+  }
 } //--- end class
  ?>
