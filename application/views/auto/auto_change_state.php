@@ -1,22 +1,31 @@
 <?php $this->load->view('include/header'); ?>
 <div class="row">
-  <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 padding-5 padding-top-5">
-    <h3 class="title">ออเดอร์ รอย้อนสถานะ <?php echo $count; ?> จากทั้งหมด <?php echo number($all); ?></h3>
+  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 padding-5 padding-top-5">
+    <h4 class="title">รอดำเนินการ <?php echo $count; ?> ออเดอร์ จากทั้งหมด <?php echo number($all); ?></h4>
   </div>
-  <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 padding-5 text-right">
+  <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 padding-5 text-right">
+    <button type="button" class="btn btn-white btn-info top-btn" onclick="refresh()"><i class="fa fa-refresh"></i> Refresh</button>
     <?php if($this->pm->can_edit) : ?>
-    <button type="button" class="btn btn-white btn-primary top-btn btn-100" onclick="getUploadFile()"><i class="fa fa-upload"></i> &nbsp; Import Order</button>
-    <button type="button" class="btn btn-white btn-warning top-btn btn-100" onclick="clearAllData()"><i class="fa fa-times"></i> &nbsp; Clear All Data</button>
+    <button type="button" class="btn btn-white btn-primary top-btn" onclick="getUploadFile()"><i class="fa fa-upload"></i> &nbsp; Import Order</button>
+    <button type="button" class="btn btn-white btn-warning top-btn" onclick="clearAllData()"><i class="fa fa-times"></i> &nbsp; Clear All Data</button>
     <?php endif; ?>
   </div>
 </div>
 <hr/>
 <div class="row">
-  <div class="col-lg-9 col-md-7 col-sm-7 hidden-xs">&nbsp; </div>
-  <div class="col-lg-2 col-md-3-harf col-sm-3-harf col-xs-9 padding-5">
+  <div class="col-lg-6-harf col-md-4 col-sm-3 hidden-xs">&nbsp; </div>
+  <div class="col-lg-2 col-md-3 col-sm-4 col-xs-6 padding-5">
+    <div class="input-group">
+      <span class="input-group-addon">จำนวน/รอบ</span>
+      <input type="number" class="form-control input-sm text-center" id="order-limit" onchange="changeOrderLimit()" value="<?php echo $limit; ?>" />
+    </div>
+  </div>
+  <div class="divider-hidden visible-xs"></div>
+
+  <div class="col-lg-2-harf col-md-3-harf col-sm-3-harf col-xs-9 padding-5">
     <div class="input-group">
       <span class="input-group-addon">สถานะ</span>
-      <select class="form-control" id="state">
+      <select class="form-control input-sm" id="state">
         <option value="">Select State</option>
         <option value="1">รอดำเนินการ</option>
         <option value="3">รอจัดสินค้า</option>
@@ -26,7 +35,7 @@
     </div>
   </div>
   <div class="col-lg-1 col-md-1-harf col-sm-1-harf col-xs-3 padding-5">
-    <button type="button" class="btn btn-sm btn-success btn-block" onclick="startExport()">Start</button>
+    <button type="button" class="btn btn-xs btn-success btn-block" style="height:30px;" onclick="startExport()">GO</button>
   </div>
 </div>
 <hr/>
@@ -271,7 +280,7 @@ function uploadfile()	{
 
         if(rs.trim() === 'success') {
           swal({
-            title:'นำเข้าเรียบร้อยแล้ว',            
+            title:'นำเข้าเรียบร้อยแล้ว',
             type:'success',
             html:true,
             timer:1000
@@ -293,8 +302,7 @@ function uploadfile()	{
 }
 
 
-function clearAllData()
-{
+function clearAllData() {
   swal({
     title:'Clear Data',
     text:'Clear All Data, Do you want to process this operation ?',
@@ -333,6 +341,36 @@ function clearAllData()
         showError(rs);
       }
     })
+  })
+}
+
+
+function changeOrderLimit() {
+  let limit = parseDefault(parseInt($('#order-limit').val()), 0);
+
+  if(limit <= 0) {
+    swal("จำนวนต้องมากกว่า 0");
+    return false;
+  }
+
+  $.ajax({
+    url:HOME + 'change_order_limit',
+    type:'POST',
+    cache:false,
+    data:{
+      'limit' : limit
+    },
+    success:function(rs) {
+      if(rs.trim() === 'success') {
+        refresh();
+      }
+      else {
+        showError(rs);
+      }
+    },
+    error:function(rs) {
+      showError(rs);
+    }
   })
 }
 

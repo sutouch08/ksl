@@ -26,13 +26,14 @@ class Auto_change_state extends PS_Controller
 
   public function index()
   {
-    $limit = getConfig('AUTO_CONFRIM_ORDER_LIMIT');
+    $limit = getConfig('AUTO_CHANGE_STATE_LIMIT');
     $limit = empty($limit) ? 100 : $limit;
 
     $data = $this->get_all($limit);
 
     $ds['count'] = empty($data) ? 0 : count($data);
     $ds['all'] = $this->count_all();;
+    $ds['limit'] = $limit;
     $ds['data'] = $data;
 
     $this->load->view('auto/auto_change_state', $ds);
@@ -45,7 +46,7 @@ class Auto_change_state extends PS_Controller
     ->select('a.*, o.state')
     ->from('auto_send_to_sap_order AS a')
     ->join('orders AS o', 'a.code = o.code', 'left')
-    ->where('a.status !=', 1)
+    ->where('a.status', 0)
     ->limit($limit)
     ->get();
 
@@ -60,7 +61,7 @@ class Auto_change_state extends PS_Controller
 
   public function count_all()
   {
-    $count = $this->db->where('status !=', 1)->count_all_results('auto_send_to_sap_order');
+    $count = $this->db->where('status', 0)->count_all_results('auto_send_to_sap_order');
 
     return $count;
   }
@@ -176,7 +177,7 @@ class Auto_change_state extends PS_Controller
   public function insert(array $ds = array())
   {
     if( ! empty($ds))
-    {      
+    {
       return $this->db->insert_batch('auto_send_to_sap_order', $ds);
     }
 
@@ -194,6 +195,31 @@ class Auto_change_state extends PS_Controller
     {
       $sc = FALSE;
       $this->error = "Failed to clear data";
+    }
+
+    $this->_response($sc);
+  }
+
+
+  public function change_order_limit()
+  {
+    $sc = TRUE;
+    $limit = $this->input->post('limit');
+
+    if($limit > 0)
+    {
+      $this->load->model('setting/config_model');
+
+      if( ! $this->config_model->update('AUTO_CHANGE_STATE_LIMIT', $limit))
+      {
+        $sc = FALSE;
+        $this->error = "Failed to update config value";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "จำนวนต้องมากกว่า 0";
     }
 
     $this->_response($sc);
