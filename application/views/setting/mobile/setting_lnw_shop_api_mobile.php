@@ -5,7 +5,7 @@
 
 <form id="lnwForm" class="margin-top-30" method="post" action="<?php echo $this->home; ?>/update_config">
 	<div class="row">
-		<div class="col-xs-8 padding-top-5">LNW SHP API</div>
+		<div class="col-xs-8 padding-top-5">LNW SHOP API</div>
 		<div class="col-xs-4 text-right">
 			<label style="padding-top:5px; margin-bottom:0px;">
 				<input class="ace ace-switch ace-switch-7" data-name="LNW_SHOP_API" type="checkbox" value="1" <?php echo is_checked($LNW_SHOP_API , '1'); ?> onchange="toggleOption($(this))"/>
@@ -17,7 +17,7 @@
 
 		<div class="col-xs-12">API Endpoint</div>
 		<div class="col-xs-12 padding-top-5">
-			<input type="text" class="width-100" name="LNW_SHOP_HOST"  value="<?php echo $LNW_SHOP_HOST; ?>" />
+			<input type="text" class="width-100" name="LNW_SHOP_API_ENDPOINT"  value="<?php echo $LNW_SHOP_API_ENDPOINT; ?>" />
 		</div>
 		<div class="divider"></div>
 
@@ -71,10 +71,10 @@
 		<div class="col-xs-8 padding-top-5">Test Mode</div>
 		<div class="col-xs-4 text-right">
 			<label style="padding-top:5px; margin-bottom:0px;">
-				<input class="ace ace-switch ace-switch-7" data-name="LNW_SHOP_TEST" type="checkbox" value="1" <?php echo is_checked($LNW_SHOP_TEST , '1'); ?> onchange="toggleOption($(this))"/>
+				<input class="ace ace-switch ace-switch-7" data-name="LNW_SHOP_API_TEST" type="checkbox" value="1" <?php echo is_checked($LNW_SHOP_API_TEST , '1'); ?> onchange="toggleOption($(this))"/>
 				<span class="lbl margin-left-0" data-lbl="OFF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ON"></span>
 			</label>
-			<input type="hidden" name="LNW_SHOP_TEST" value="<?php echo $LNW_SHOP_TEST; ?>"/>
+			<input type="hidden" name="LNW_SHOP_API_TEST" value="<?php echo $LNW_SHOP_API_TEST; ?>"/>
 		</div>
 		<div class="divider"></div>
 		<div class="divider-hidden"></div>

@@ -2,13 +2,13 @@
 <?php $this->load->view('setting/mobile/style'); ?>
 <div class="row">
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding-5">
-    	<h4 class="title"><?php echo $this->title; ?></h4>
+		<h4 class="title"><?php echo $this->title; ?></h4>
 	</div>
 </div>
 
 <div class="row">
 	<div class="setting-menu">
-		<?php if($cando) : ?>
+		<?php if ($cando) : ?>
 			<div class="menu-block">
 				<a class="menu-link" href="javascript:goSetting('system')">System <i class="fa fa-angle-right pull-right font-size-20"></i></a>
 			</div>
@@ -36,10 +36,10 @@
 			<a class="menu-link" href="javascript:goSetting('ix')">IX API <i class="fa fa-angle-right pull-right font-size-20"></i></a>
 		</div>
 		<div class="menu-block">
-			<a class="menu-link" href="javascript:goSetting('wrx')">WRX API <i class="fa fa-angle-right pull-right font-size-20"></i></a>
+			<a class="menu-link" href="javascript:goSetting('pos')">POS API <i class="fa fa-angle-right pull-right font-size-20"></i></a>
 		</div>
 		<div class="menu-block">
-			<a class="menu-link" href="javascript:goSetting('pos')">POS API <i class="fa fa-angle-right pull-right font-size-20"></i></a>
+			<a class="menu-link" href="javascript:goSetting('lnw_shop')">LNW SHOP API <i class="fa fa-angle-right pull-right font-size-20"></i></a>
 		</div>
 	</div>
 </div><!--/ row  -->
@@ -70,11 +70,11 @@
 <div class="setting-panel move-out" id="ix">
 	<?php $this->load->view('setting/mobile/setting_ix_api_mobile'); ?>
 </div>
-<div class="setting-panel move-out" id="wrx">
-	<?php $this->load->view('setting/mobile/setting_wrx_api_mobile'); ?>
-</div>
 <div class="setting-panel move-out" id="pos">
 	<?php $this->load->view('setting/mobile/setting_pos_api_mobile'); ?>
+</div>
+<div class="setting-panel move-out" id="lnw_shop">
+	<?php $this->load->view('setting/mobile/setting_lnw_shop_api_mobile'); ?>
 </div>
 
 <script src="<?php echo base_url(); ?>scripts/setting/setting_mobile.js?v=<?php echo date('Ymd'); ?>"></script>

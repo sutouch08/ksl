@@ -23,14 +23,12 @@
 		$tab5 = $tab == 'order' ? 'active in' : '';
 		$tab6 = $tab == 'document' ? 'active in' : '';
 		$tab7 = $tab == 'bookcode' ? 'active in' : '';
-		$tab8 = $tab == 'SAP' ? 'active in' : '';
-		$tab9 = $tab == 'WMS' ? 'active in' : '';
-		$tab10 = $tab == 'sokojung' ? 'active in' : '';
-		$tab11 = $tab == 'chatbot' ? 'active in' : '';
-		$tab12 = $tab == 'web' ? 'active in' : '';
-		$tab13 = $tab == 'ix' ? 'active in' : '';
-		$tab14 = $tab == 'wrx' ? 'active in' : '';
-		$tab15 = $tab == 'pos' ? 'active in' : '';
+		$tab8 = $tab == 'SAP' ? 'active in' : '';		
+		$tab9 = $tab == 'ix' ? 'active in' : '';
+		$tab10 = $tab == 'pos' ? 'active in' : '';
+		$tab11 = $tab == 'web' ? 'active in' : '';
+		$tab12 = $tab == 'wrx' ? 'active in' : '';
+		$tab13 = $tab == 'lnw' ? 'active in' : '';
 
 		?>
 		<ul id="myTab1" class="setting-tabs" style="margin-left:0;">
@@ -41,9 +39,9 @@
 			<li class="li-block <?php echo $tab6; ?>" onclick="changeURL('document')"><a href="#document" data-toggle="tab">เลขที่เอกสาร</a></li>
 			<li class="li-block <?php echo $tab7; ?>" onclick="changeURL('bookcode')"><a href="#bookcode" data-toggle="tab">เล่มเอกสาร</a></li>
 			<li class="li-block <?php echo $tab8; ?>" onclick="changeURL('SAP')"><a href="#SAP" data-toggle="tab">ข้อมูล SAP</a></li>
-			<li class="li-block <?php echo $tab13; ?>" onclick="changeURL('ix')"><a href="#ix" data-toggle="tab">IX API</a></li>
-			<!-- <li class="li-block <?php echo $tab14; ?>" onclick="changeURL('wrx')"><a href="#wrx" data-toggle="tab">WRX API</a></li> -->
-			<li class="li-block <?php echo $tab15; ?>" onclick="changeURL('pos')"><a href="#pos" data-toggle="tab">POS API</a></li>
+			<li class="li-block <?php echo $tab9; ?>" onclick="changeURL('ix')"><a href="#ix" data-toggle="tab">IX API</a></li>			
+			<li class="li-block <?php echo $tab10; ?>" onclick="changeURL('pos')"><a href="#pos" data-toggle="tab">POS API</a></li>
+			<li class="li-block <?php echo $tab13; ?>" onclick="changeURL('lnw')"><a href="#lnw" data-toggle="tab">LNW SHOP API</a></li>
 
 		</ul>
 	</div>
@@ -77,16 +75,16 @@
 				<?php $this->load->view('setting/setting_sap'); ?>
 			</div>
 
-			<div class="tab-pane fade <?php echo $tab13; ?>" id="ix">
+			<div class="tab-pane fade <?php echo $tab9; ?>" id="ix">
 				<?php $this->load->view('setting/setting_ix_api'); ?>
+			</div>			
+
+			<div class="tab-pane fade <?php echo $tab10; ?>" id="pos">
+				<?php $this->load->view('setting/setting_pos_api'); ?>
 			</div>
 
-			<!-- <div class="tab-pane fade <?php echo $tab14; ?>" id="wrx">
-				<?php //$this->load->view('setting/setting_wrx_api'); ?>
-			</div> -->
-
-			<div class="tab-pane fade <?php echo $tab15; ?>" id="pos">
-				<?php $this->load->view('setting/setting_pos_api'); ?>
+			<div class="tab-pane fade <?php echo $tab13; ?>" id="lnw">
+				<?php $this->load->view('setting/setting_lnw_shop_api'); ?>
 			</div>
 
 		</div><!--/ tab-content-->

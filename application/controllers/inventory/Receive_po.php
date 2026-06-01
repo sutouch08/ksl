@@ -395,9 +395,7 @@ class Receive_po extends PS_Controller
             }
 
             if($sc === TRUE)
-            {
-              $posting_date = empty($ds->posting_date) ? NULL : db_date($ds->posting_date, TRUE);
-
+            {              
               $arr = array(
                 'status' => 1,
                 'shipped_date' => empty($doc->shipped_date) ? now() : $doc->shipped_date,
@@ -422,15 +420,55 @@ class Receive_po extends PS_Controller
 
             if($sc === TRUE)
             {
+              $this->error = "";
+
+              $lnwWhs = getConfig('LNW_SHOP_WAREHOUSE');
+
+              if($doc->warehouse_code == $lnwWhs)
+              {
+                $lnwApi = is_true(getConfig('LNW_SHOP_API'));
+                $syncStock = is_true(getConfig('SYNC_LNW_SHOP_STOCK'));
+
+                if($lnwApi && $syncStock && ! empty($details))
+                {
+                  $this->load->library('lnw_shop_api');
+
+                  $products = [];
+
+                  foreach($details as $rs)
+                  {
+                    $products[] = (object) array(
+                      'product_sku' => $rs->product_code,
+                      'stock' => intval($rs->receive_qty),
+                      'reference_no' => $doc->code,
+                      'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
+                    );
+                  }
+
+                  if( ! empty($products))
+                  {
+                    if( ! $this->lnw_shop_api->addStockBatch($products, $doc->code, 'GR'))
+                    {
+                      $sc = FALSE;
+                      $ex = 0;
+                      $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> ".trim($this->lnw_shop_api->error).'<br/>';
+                    }
+
+                    $this->receive_po_model->update($doc->code, ['lnw_export' => $sc === TRUE ? 1 : 3]);
+                  }
+                }                                
+              }
+
+              //--- export to SAP
               $this->load->library('export');
 
-              if(! $this->export->export_receive($doc->code))
+              if (! $this->export->export_receive($doc->code))
               {
                 $sc = FALSE;
                 $ex = 0;
-                $this->error = "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า SAP ไม่สำเร็จ <br/> ".trim($this->export->error);
+                $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า SAP ไม่สำเร็จ <br/> " . trim($this->export->error) . '<br/>';
               }
-            }
+            }            
           }
         }
         else
@@ -478,6 +516,7 @@ class Receive_po extends PS_Controller
           $shipped_date = getConfig('ORDER_SOLD_DATE') == 'D' ? db_date($doc->date_add, TRUE) : (empty($doc->shipped_date) ? $doc->shipped_date : now());
 
           $this->db->trans_begin();
+          $details = [];
 
           if( ! empty($ds->rows))
           {
@@ -527,6 +566,13 @@ class Receive_po extends PS_Controller
                     $this->error = "Failed to create movemnt";;
                   }
                 }
+
+                $details[] = (object) array(
+                  'product_sku' => $row->product_code,
+                  'receive_qty' => intval($rs->receive_qty),
+                  'reference_no' => $doc->code,
+                  'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
+                );
               }
               else
               {
@@ -563,7 +609,34 @@ class Receive_po extends PS_Controller
 
           if($sc === TRUE)
           {
+            $this->error = "";
+
+            //--export stock to LNW SHOP
+            $lnwWhs = getConfig('LNW_SHOP_WAREHOUSE');
+
+            if($doc->warehouse_code == $lnwWhs)
+            {
+              $lnwApi = is_true(getConfig('LNW_SHOP_API'));
+              $syncStock = is_true(getConfig('SYNC_LNW_SHOP_STOCK'));
+
+              if($lnwApi && $syncStock && ! empty($details))
+              {
+                $this->load->library('lnw_shop_api');
+
+                if( ! $this->lnw_shop_api->addStockBatch($details, $doc->code, 'GR'))
+                {
+                  $sc = FALSE;
+                  $ex = 0;
+                  $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> ".trim($this->lnw_shop_api->error).'<br/>';
+                }
+
+                $this->receive_po_model->update($doc->code, ['lnw_export' => $sc === TRUE ? 1 : 3]);
+              }
+            }
+
+            //-- export to SAP
             $this->load->library('export');
+
             if(! $this->export->export_receive($doc->code))
             {
               $sc = FALSE;
@@ -819,7 +892,9 @@ class Receive_po extends PS_Controller
   {
     $sc = TRUE;
     $ex = 1;
-    $isSoko = FALSE;
+    $lnwWhs = getConfig('LNW_SHOP_WAREHOUSE');
+    $lnwApi = is_true(getConfig('LNW_SHOP_API'));
+    $syncStock = is_true(getConfig('SYNC_LNW_SHOP_STOCK'));
 
     $ds = json_decode($this->input->post('data'));
 
@@ -865,10 +940,11 @@ class Receive_po extends PS_Controller
             'zone_code' => $zone->code,
             'warehouse_code' => $zone->warehouse_code,
             'update_user' => $this->_user->uname,
-            'approver' => $ds->approver,
+            'approver' => $approver,
             'currency' => empty($ds->DocCur) ? "THB" : $ds->DocCur,
             'rate' => empty($ds->DocRate) ? 1 : $ds->DocRate,
-            'must_accept' => $must_accept
+            'must_accept' => $must_accept,
+            'remark' => $remark
           );
 
           $this->db->trans_begin();
@@ -915,7 +991,7 @@ class Receive_po extends PS_Controller
                       'product_name' => $pd->name,
                       'price' => $rs->price,
                       'qty' => $rs->qty,
-                      'receive_qty' => (! $isSoko && $ds->save_type == 1 ) ? $rs->qty : 0,
+                      'receive_qty' => $ds->save_type == 1 ? $rs->qty : 0,
                       'amount' => $amount,
                       'before_backlogs' => $bf,
                       'after_backlogs' => $af,
@@ -925,19 +1001,13 @@ class Receive_po extends PS_Controller
                       'vatRate' => $rs->vatRate
                     );
 
-                    if($must_accept == 0 && $isSoko && $ds->save_type != 0)
+                    if($must_accept == 0 && $lnwApi && $syncStock && $ds->save_type != 0)
                     {
                       $details[] = (object) array(
-                        'receive_code' => $ds->code,
-                        'style_code' => $pd->style_code,
-                        'product_code' => $pd->code,
-                        'product_name' => $pd->name,
-                        'unit_code' => $pd->unit_code,
-                        'price' => $rs->price,
-                        'qty' => $rs->qty,
-                        'amount' => $amount,
-                        'before_backlogs' => $bf,
-                        'after_backlogs' => $af
+                        'product_sku' => $pd->code,
+                        'stock' => intval($rs->qty),
+                        'reference_no' => $doc->code,
+                        'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
                       );
                     }
 
@@ -1007,13 +1077,30 @@ class Receive_po extends PS_Controller
         if($sc === TRUE && $must_accept == 0 && $ds->save_type != 0)
         {
           if($ds->save_type == 1)
-          {
+          {       
+            $this->error = "";
+
+            if($zone->warehouse_code == $lnwWhs && $lnwApi && $syncStock && ! empty($details))
+            {
+              $this->load->library('lnw_shop_api');
+
+              if( ! $this->lnw_shop_api->addStockBatch($details, $doc->code, 'GR'))
+              {
+                $sc = FALSE;
+                $ex = 0;
+                $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> ".trim($this->lnw_shop_api->error).'<br/>';
+              }
+
+              $this->receive_po_model->update($doc->code, ['lnw_export' => $sc === TRUE ? 1 : 3]);
+            }
+
             $this->load->library('export');
+
             if(! $this->export->export_receive($doc->code))
             {
               $sc = FALSE;
               $ex = 0;
-              $this->error = "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า SAP ไม่สำเร็จ <br/> ".trim($this->export->error);
+              $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า SAP ไม่สำเร็จ <br/> ".trim($this->export->error).'<br/>';
             }
           }
         }
@@ -1178,13 +1265,48 @@ class Receive_po extends PS_Controller
       {
         if($save_type == 1)
         {
+          $this->error = "";
+
+          $lnwWhs = getConfig('LNW_SHOP_WAREHOUSE');
+          $lnwApi = is_true(getConfig('LNW_SHOP_API'));
+          $syncStock = is_true(getConfig('SYNC_LNW_SHOP_STOCK'));
+
+          if($doc->warehouse_code == $lnwWhs && $lnwApi && $syncStock && ! empty($details))
+          {
+            $this->load->library('lnw_shop_api');
+
+            $products = [];
+
+            foreach($details as $rs)
+            {
+              $products[] = (object) array(
+                'product_sku' => $rs->product_code,
+                'stock' => intval($rs->qty),
+                'reference_no' => $code,
+                'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
+              );
+            }
+
+            if( ! empty($products))
+            {
+              if( ! $this->lnw_shop_api->addStockBatch($products, $code, 'GR'))
+              {
+                $sc = FALSE;
+                $ex = 0;
+                $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> ".trim($this->lnw_shop_api->error).'<br/>';
+              }
+
+              $this->receive_po_model->update($doc->code, ['lnw_export' => $sc === TRUE ? 1 : 3]);
+            }
+          }
+
           $this->load->library('export');
 
           if(! $this->export->export_receive($code))
           {
             $sc = FALSE;
             $ex = 0;
-            $this->error = "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า SAP ไม่สำเร็จ <br/> ".trim($this->export->error);
+            $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า SAP ไม่สำเร็จ <br/> ".trim($this->export->error).'<br/>';
           }
         }
       }
@@ -1295,6 +1417,51 @@ class Receive_po extends PS_Controller
             $this->db->trans_rollback();
           }
         }
+
+        if($sc === TRUE)
+        {
+          if($doc->lnw_export == 1)
+          {
+            $lnwApi = is_true(getConfig('LNW_SHOP_API'));
+            $syncStock = is_true(getConfig('SYNC_LNW_SHOP_STOCK'));
+
+            if($lnwApi && $syncStock)
+            {
+              $details = $this->receive_po_model->get_details($code);
+
+              if( ! empty($details))
+              {
+                $products = [];
+
+                foreach($details as $rs)
+                {
+                  $products[] = (object) array(
+                    'product_sku' => $rs->product_code,
+                    'stock' => 0,
+                    'reference_no' => $code,
+                    'detail' => "ย้อนสถานะการรับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
+                  );
+                }
+
+                if( ! empty($products))
+                {
+                  $this->load->library('lnw_shop_api');
+
+                  if( ! $this->lnw_shop_api->cancelStockBatch($products, $code, 'GR'))
+                  {
+                    $sc = FALSE;                    
+                    $this->error = "ย้อนสถานะสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> ".trim($this->lnw_shop_api->error).'<br/>';
+                  }
+
+                  if($sc === TRUE)
+                  {
+                    $this->receive_po_model->update($code, ['lnw_export' => NULL]);
+                  }
+                }
+              }
+            }
+          }            
+        }
 			}
 			else
 			{
@@ -1393,6 +1560,48 @@ class Receive_po extends PS_Controller
             {
               $sc = FALSE;
               $this->error = 'ยกเลิกรายการไม่สำเร็จ';
+            }
+          }
+
+          if($sc === TRUE && $doc->status == 1 && $doc->lnw_export == 1)
+          {
+            $lnwApi = is_true(getConfig('LNW_SHOP_API'));
+            $syncStock = is_true(getConfig('SYNC_LNW_SHOP_STOCK'));
+
+            if($lnwApi && $syncStock)
+            {
+              $details = $this->receive_po_model->get_details($code);
+
+              if( ! empty($details))
+              {
+                $products = [];
+
+                foreach($details as $rs)
+                {
+                  $products[] = (object) array(
+                    'product_sku' => $rs->product_code,
+                    'stock' => 0,
+                    'reference_no' => $code,
+                    'detail' => "ยกเลิกการรับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
+                  );
+                }
+
+                if( ! empty($products))
+                {
+                  $this->load->library('lnw_shop_api');
+
+                  if( ! $this->lnw_shop_api->cancelStockBatch($products, $code, 'GR'))
+                  {
+                    $sc = FALSE;                    
+                    $this->error = "ยกเลิกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> ".trim($this->lnw_shop_api->error).'<br/>';
+                  }
+
+                  if($sc === TRUE)
+                  {
+                    $this->receive_po_model->update($code, ['lnw_export' => NULL]);
+                  }
+                }
+              }
             }
           }
         }

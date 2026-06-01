@@ -1,9 +1,4 @@
 	<form id="lnwForm" method="post" action="<?php echo $this->home; ?>/update_config">
-
-
-
-
-
   	<div class="row">
 			<div class="col-lg-4 col-md-4 col-sm-4">
 				<span class="form-control left-label">LNW SHOP API</span>
@@ -21,7 +16,7 @@
         <span class="form-control left-label">API Endpoint</span>
       </div>
       <div class="col-lg-8 col-md-8 col-sm-8">
-        <input type="text" class="form-control input-sm input-xxlarge" name="LNW_SHOP_HOST"  value="<?php echo $LNW_SHOP_HOST; ?>" />
+        <input type="text" class="form-control input-sm input-xxlarge" name="LNW_SHOP_API_ENDPOINT"  value="<?php echo $LNW_SHOP_API_ENDPOINT; ?>" />
       </div>
       <div class="divider"></div>
 
@@ -89,10 +84,10 @@
 			</div>
 			<div class="col-lg-8 col-md-8 col-sm-8">
 				<label style="padding-top:5px; margin-bottom:0px;">
-					<input class="ace ace-switch ace-switch-7" data-name="LNW_SHOP_TEST" type="checkbox" value="1" <?php echo is_checked($LNW_SHOP_TEST , '1'); ?> onchange="toggleOption($(this))"/>
+					<input class="ace ace-switch ace-switch-7" data-name="LNW_SHOP_API_TEST" type="checkbox" value="1" <?php echo is_checked($LNW_SHOP_API_TEST , '1'); ?> onchange="toggleOption($(this))"/>
 					<span class="lbl margin-left-0" data-lbl="OFF&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ON"></span>
 				</label>
-				<input type="hidden" name="LNW_SHOP_TEST" value="<?php echo $LNW_SHOP_TEST; ?>"/>
+				<input type="hidden" name="LNW_SHOP_API_TEST" value="<?php echo $LNW_SHOP_API_TEST; ?>"/>
 			</div>
 			<div class="divider"></div>
 			<div class="divider-hidden"></div>
