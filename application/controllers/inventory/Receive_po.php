@@ -1479,6 +1479,84 @@ class Receive_po extends PS_Controller
 	}
 
 
+  public function send_to_lnw_shop($code)
+  {
+    $sc = TRUE;
+    $doc = $this->receive_po_model->get($code);
+    $details = $this->receive_po_model->get_details($code);
+    $lnwWhs = getConfig('LNW_SHOP_WAREHOUSE');
+    $lnwApi = is_true(getConfig('LNW_SHOP_API'));
+    $syncStock = is_true(getConfig('SYNC_LNW_SHOP_STOCK'));
+
+    if(empty($doc))
+    {
+      $sc = FALSE;
+      $this->error = "Invalid document number";
+    }
+
+    if($sc === TRUE && $doc->status != 1)
+    {
+      $sc = FALSE;
+      $this->error = "Invalid document status";
+    }
+
+    if($sc === TRUE && $doc->lnw_export == 1)
+    {
+      $sc = FALSE;
+      $this->error = "Document has already been sent to LNW SHOP";
+    }
+
+    if($sc === TRUE && (! $lnwApi OR ! $syncStock))
+    {
+      $sc = FALSE;
+      $this->error = "LNW SHOP API is not enabled";
+    }
+
+    if($sc === TRUE && ($doc->warehouse_code != $lnwWhs))
+    {
+      $sc = FALSE;
+      $this->error = "Document warehouse does not match LNW SHOP warehouse";
+    }
+
+    if($sc === TRUE && empty($details))
+    {
+      $sc = FALSE;
+      $this->error = "Document has no details to send";
+    }
+
+    if($sc === TRUE)
+    {
+      $this->load->library('lnw_shop_api');
+
+      $products = [];
+
+      foreach($details as $rs)
+      {
+        $products[] = (object) array(
+          'product_sku' => $rs->product_code,
+          'stock' => intval($rs->receive_qty),
+          'reference_no' => $doc->code,
+          'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
+        );
+      }
+
+      if(! empty($products))
+      {
+        if(! $this->lnw_shop_api->addStockBatch($products, $doc->code, 'GR'))
+        {
+          $sc = FALSE;
+          $this->error = "Failed to send data to LNW SHOP: " . trim($this->lnw_shop_api->error);
+        }
+
+        $this->receive_po_model->update($doc->code, ['lnw_export' => $sc === TRUE ? 1 : 3]);
+      }
+    }
+
+    $this->_response($sc);
+  }
+
+  
+
   public function do_export($code)
   {
     $sc = TRUE;
@@ -1524,9 +1602,7 @@ class Receive_po extends PS_Controller
     {
       $this->load->model('inventory/movement_model');
       $code = $this->input->post('receive_code');
-			$reason = $this->input->post('reason');
-      $force_cancel = $this->input->post('force_cancel') == 1 ? TRUE : FALSE;
-
+			$reason = $this->input->post('reason');      
       $doc = $this->receive_po_model->get($code);
 
       if( ! empty($doc))
@@ -1549,18 +1625,48 @@ class Receive_po extends PS_Controller
 
           if($sc === TRUE)
           {
-            $this->db->trans_start();
-            $this->receive_po_model->cancle_details($code);
-            $this->receive_po_model->set_status($code, 2); //--- 0 = ยังไม่บันทึก 1 = บันทึกแล้ว 2 = ยกเลิก
-    				$this->receive_po_model->set_cancle_reason($code, $reason);
-            $this->movement_model->drop_movement($code);
-            $this->db->trans_complete();
+            $this->db->trans_begin();
 
-            if($this->db->trans_status() === FALSE)
+            if( ! $this->receive_po_model->update_details($code, ['is_cancle' => 1]))
             {
               $sc = FALSE;
-              $this->error = 'ยกเลิกรายการไม่สำเร็จ';
+              $this->error = "Failed to cancel transections";
             }
+
+            if($sc === TRUE)
+            {
+              $arr = array(
+                'status' => 2,
+                'inv_code' => NULL,
+                'cancle_reason' => $reason,
+                'cancle_user' => $this->_user->uname,
+                'cancle_date' => now()
+              );
+
+              if( ! $this->receive_po_model->update($code, $arr))
+              {
+                $sc = FALSE;
+                $this->error = "Failed to update document status";
+              }
+            }
+
+            if($sc === TRUE)
+            {
+              if( ! $this->movement_model->drop_movement($code))
+              {
+                $sc = FALSE;
+                $this->error = "Failed to remove movement";
+              }
+            }
+
+            if($sc === TRUE)
+            {
+              $this->db->trans_commit();
+            }
+            else 
+            {
+              $this->db->trans_rollback();
+            }            
           }
 
           if($sc === TRUE && $doc->status == 1 && $doc->lnw_export == 1)

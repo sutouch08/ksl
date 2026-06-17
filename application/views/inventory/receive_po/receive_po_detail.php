@@ -7,6 +7,7 @@
 	{
 		$canAccept = (($pm->can_add + $pm->can_edit + $pm->can_delete + $pm->can_approve) > 0  OR $this->_SuperAdmin) ? TRUE : FALSE;
 	}
+	$lnwApi = is_true(getConfig('LNW_SHOP_API'));
 ?>
 <div class="row">
 	<div class="col-lg-4 col-md-4 col-sm-4 hidden-xs padding-5">
@@ -27,6 +28,9 @@
 			<?php endif; ?>
 			<?php if($doc->status == 1) : ?>
 			<button type="button" class="btn btn-xs btn-success btn-top" onclick="doExport()"><i class="fa fa-send"></i> ส่งข้อมูลไป SAP</button>
+				<?php if($lnwApi && $doc->lnw_export != 1) : ?>
+				<button type="button" class="btn btn-xs btn-primary btn-top" onclick="sendToLnwShop()"><i class="fa fa-send"></i> ส่งข้อมูลไป LNW SHOP</button>
+				<?php endif; ?>
 			<?php endif; ?>			
 			<?php if($doc->status == 4 && ($doc->user_id = $this->_user->id OR $canAccept)) : ?>
 				<button type="button" class="btn btn-xs btn-success btn-top" onclick="accept()"><i class="fa fa-check-circle"></i> ยืนยันการรับสินค้า</button>
@@ -88,30 +92,28 @@
     <label>รหัสโซน</label>
     <input type="text" class="form-control input-sm text-center" value="<?php echo $doc->zone_code; ?>" disabled />
   </div>
-  <div class="col-lg-5-harf col-md-7 col-sm-7 col-xs-8 padding-5">
+  <div class="col-lg-5-harf col-md-5-harf col-sm-5-harf col-xs-4 padding-5">
   	<label>ชื่อโซน</label>
     <input type="text" class="form-control input-sm" value="<?php echo $doc->zone_name; ?>" disabled/>
   </div>
-	<div class="col-lg-1-harf col-md-1-harf col-sm-2 col-xs-4 padding-5">
+	<div class="col-lg-1-harf col-md-1-harf col-sm-1-harf col-xs-4 padding-5">
 		<label>User</label>
 		<input type="text" class="form-control input-sm" value="<?php echo $doc->user; ?>" disabled/>
-	</div>
-	<?php if($doc->status == 2) : ?>
-		<div class="col-lg-6-harf col-md-5 col-sm-5 col-xs-8 padding-5">
-			<label>หมายเหตุ</label>
-			<input type="text" class="form-control input-sm" value="<?php echo $doc->remark; ?>" disabled />
-		</div>
-		<div class="col-lg-4 col-md-4 col-sm-5 col-xs-8 padding-5">
-			<label>เหตุผลการยกเลิก</label>
-			<input type="text" class="form-control input-sm" value="<?php echo $doc->cancle_reason; ?>" disabled />
-		</div>
-	<?php else : ?>
-  <div class="col-lg-10-harf col-md-9 col-sm-8 col-xs-4 padding-5">
+	</div>	
+  <div class="col-lg-9-harf col-md-9 col-sm-8 col-xs-12 padding-5">
 		<label>หมายเหตุ</label>
 		<input type="text" class="form-control input-sm" value="<?php echo $doc->remark; ?>" disabled />
 	</div>
-	<?php endif; ?>
 	<div class="col-lg-1-harf col-md-1-harf col-sm-2 col-xs-4 padding-5">
+		<label>LNW API</label>
+		<div class="input-group width-100">
+			<input type="text" class="form-control input-sm text-center" value="<?php echo ($doc->lnw_export == 1) ? 'Success' : (($doc->lnw_export == 3) ? 'Failed' : 'No'); ?>" disabled />
+			<span class="input-group-btn">
+				<button type="button" class="btn btn-xs btn-primary" style="height: 30px;" onclick="viewApiLogs('<?php echo $doc->code; ?>')"><i class="fa fa-external-link"></i></button>
+			</span>
+		</div>		
+	</div>
+	<div class="col-lg-1 col-md-1-harf col-sm-2 col-xs-4 padding-5">
 		<label>SAP No.</label>
 		<input type="text" class="form-control input-sm text-center" value="<?php echo $doc->inv_code; ?>" disabled />
 	</div>
@@ -216,6 +218,11 @@ else
 		<?php if($doc->must_accept == 1 && $doc->is_accept == 1) : ?>
 			<span class="green display-block">ยืนยันการรับโดย : <?php echo $doc->accept_by; ?> @ <?php echo thai_date($doc->accept_on, TRUE); ?></span>
 			<span class="green display-block">หมายเหตุ : <?php echo $doc->accept_remark; ?></span>
+		<?php endif; ?>
+
+		<?php if($doc->status == 2) : ?>
+			<span class="red display-block">ยกเลิกโดย : <?php echo $doc->cancle_user; ?> @ <?php echo thai_date($doc->cancle_date, TRUE); ?></span>
+			<span class="red display-block">เหตุผลการยกเลิก : <?php echo $doc->cancle_reason; ?></span>
 		<?php endif; ?>
 	</div>
 </div>

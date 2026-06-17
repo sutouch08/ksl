@@ -259,6 +259,32 @@ function doExport(){
 }
 
 
+function sendToLnwShop() {
+	let code = $('#receive_code').val();
+	load_in();
+	$.ajax({
+		url: HOME + 'send_to_lnw_shop/'+code,
+		type:'POST',
+		success:function(rs) {
+			load_out();
+			if(rs == 'success') {
+				swal({
+					title:'Success',
+					text:'Send data successfully',
+					type:'success',
+					timer:1000
+				});
+			} else {
+				showError(rs);
+			}
+		},
+		error:function(rs) {
+			showError();
+		}
+	});
+}
+
+
 function clearFilter(){
   var url = HOME + 'clear_filter';
   $.get(url, function(rs){
@@ -313,4 +339,25 @@ function pullBack(code) {
 		});
 		}, 100);
 	})
+}
+
+
+function viewApiLogs(code) {
+	
+	let url = BASE_URL + "rest/V1/lnw_shop_api_logs";
+	let mapForm = document.createElement("form");
+	mapForm.target = "Map";
+	mapForm.method = "POST";
+	mapForm.action = url;
+
+	let mapInput = document.createElement("input");
+	mapInput.type = "text";
+	mapInput.name = "code";
+	mapInput.value = code;
+	mapForm.appendChild(mapInput);
+
+	document.body.appendChild(mapForm);
+	map = window.open(url, "Map", "height=800, scrollbars=yes");
+	mapForm.submit();
+	document.body.removeChild(mapForm);
 }
