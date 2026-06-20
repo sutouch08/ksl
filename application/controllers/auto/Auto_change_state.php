@@ -29,14 +29,20 @@ class Auto_change_state extends PS_Controller
     $limit = getConfig('AUTO_CHANGE_STATE_LIMIT');
     $limit = empty($limit) ? 100 : $limit;
 
-    $data = $this->get_all($limit);
+    $filter = array(
+      'code' => get_filter('code', 'auto_code', ''),
+      'status' => get_filter('status', 'auto_status', '0')
+    );
 
-    $ds['count'] = empty($data) ? 0 : count($data);
-    $ds['all'] = $this->count_all();;
-    $ds['limit'] = $limit;
-    $ds['data'] = $data;
+    $rows = $this->count_all($filter);
+    $data = $this->get_all($filter, $limit);
 
-    $this->load->view('auto/auto_change_state', $ds);
+    $filter['count'] = empty($data) ? 0 : count($data);
+    $filter['all'] = $rows;
+    $filter['limit'] = $limit;
+    $filter['data'] = $data;
+
+    $this->load->view('auto/auto_change_state', $filter);
   }
 
 
