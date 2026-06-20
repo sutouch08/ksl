@@ -46,17 +46,30 @@ class Auto_change_state extends PS_Controller
   }
 
 
-  public function get_all($limit = 100)
+  public function get_all($filter = array(), $limit = 100)
   {
-    $rs = $this->db
-    ->select('a.*, o.state')
-    ->from('auto_send_to_sap_order AS a')
-    ->join('orders AS o', 'a.code = o.code', 'left')
-    ->where('a.status', 0)
-    ->limit($limit)
-    ->get();
+    $this->db
+      ->select('a.*, o.state')
+      ->from('auto_send_to_sap_order AS a')
+      ->join('orders AS o', 'a.code = o.code', 'left');
 
-    if($rs->num_rows() > 0)
+    if (!empty($filter['code']))
+    {
+      $this->db->like('a.code', $filter['code']);
+    }
+
+    if (isset($filter['status']) && $filter['status'] != 'all')
+    {
+      $this->db->where('a.status', $filter['status']);
+    }
+
+    $rs = $this->db
+      ->order_by('a.status', 'ASC')
+      ->order_by('a.code', 'ASC')
+      ->limit($limit)
+      ->get();
+
+    if ($rs->num_rows() > 0)
     {
       return $rs->result();
     }
@@ -65,9 +78,19 @@ class Auto_change_state extends PS_Controller
   }
 
 
-  public function count_all()
+  public function count_all(array $filter = array())
   {
-    $count = $this->db->where('status', 0)->count_all_results('auto_send_to_sap_order');
+    if (!empty($filter['code']))
+    {
+      $this->db->like('code', $filter['code']);
+    }
+
+    if (isset($filter['status']) && $filter['status'] != 'all')
+    {
+      $this->db->where('status', $filter['status']);
+    }
+
+    $count = $this->db->count_all_results('auto_send_to_sap_order');
 
     return $count;
   }
