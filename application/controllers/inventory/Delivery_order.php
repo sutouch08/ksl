@@ -607,7 +607,7 @@ class Delivery_order extends PS_Controller
 
     $sc = TRUE;
 
-    if(!empty($order))
+    if(!empty($order) && $order->state == 8)
     {
       switch($order->role)
       {
@@ -664,7 +664,7 @@ class Delivery_order extends PS_Controller
   {
     $rs = $this->do_export($code);
 
-    echo $rs === TRUE ? 'success' : $this->error;
+    echo $rs === TRUE ? trim('success') : $this->error;
   }
 
 

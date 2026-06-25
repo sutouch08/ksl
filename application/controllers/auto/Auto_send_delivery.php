@@ -18,78 +18,86 @@ class Auto_send_delivery extends PS_Controller
 
   public function index()
   {
-    $ds = ['orders' => $this->get_list()];
+    $limit = getConfig('AUTO_CHANGE_STATE_LIMIT');
+    $limit = empty($limit) ? 100 : $limit;
 
-    $this->load->view('auto/order_list_to_send', $ds);
-  }
+    $filter = array(
+      'code' => get_filter('code', 'auto_code', ''),
+      'status' => get_filter('status', 'auto_status', '0')
+    );
 
-  public function process()
+    $rows = $this->count_all($filter);
+    $data = $this->get_all($filter, $limit);     
+
+    $filter['count'] = empty($data) ? 0 : count($data);
+    $filter['all'] = $rows;
+    $filter['limit'] = $limit;
+    $filter['data'] = $data;    
+
+    $this->load->view('auto/auto_send_to_sap', $filter);
+  }  
+
+  public function update_status()
   {
-    $orders = $this->get_order_list();
+    $sc = TRUE;
+    $code = $this->input->post('code');
+    $status = $this->input->post('status');
+    $message = $this->input->post('message');
 
-    if( ! empty($orders))
+    $ds = array(
+      'status' => $status,
+      'message' => $message
+    );
+
+    if (! $this->db->where('code', $code)->update('auto_send_to_sap_order', $ds))
     {
-      foreach($orders as $rs)
-      {
-        if( ! $this->export->export_order($rs->code))
-				{
-					$arr = array(
-						'status' => 3,
-						'message' => $this->export->error
-					);
-
-					$this->update_status($rs->id, $arr);
-				}
-				else
-				{
-					$arr = array(
-						'status' => 1,
-            'message' => NULL
-					);
-
-					$this->update_status($rs->id, $arr);
-				}
-      }
+      $sc = FALSE;
+      $this->error = "Update false";
     }
 
-    echo 'success';
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+
+  public function count_all($filter = array())
+  {
+    if (!empty($filter['code']))
+    {
+      $this->db->like('code', $filter['code']);
+    }
+
+    if (isset($filter['status']) && $filter['status'] != 'all')
+    {
+      $this->db->where('status', $filter['status']);
+    }
+
+    return $this->db->count_all_results('auto_send_to_sap_order');    
   }
 
 
-	private function update_status($id, array $ds = array())
-	{
-		return $this->db->where('id', $id)->update('auto_send_to_sap_order', $ds);
-	}
-
-  public function get_list()
+  public function get_all($filter = array(), $limit = 100)
   {
-    $rs = $this->db->where_in('status', array(0, 3))->get('auto_send_to_sap_order');
+    if (!empty($filter['code']))
+    {
+      $this->db->like('code', $filter['code']);
+    }
 
-    if($rs->num_rows() > 0)
+    if (isset($filter['status']) && $filter['status'] != 'all')
+    {
+      $this->db->where('status', $filter['status']);
+    }
+
+    $rs = $this->db
+      ->order_by('status', 'ASC')
+      ->order_by('code', 'ASC')
+      ->limit($limit)
+      ->get('auto_send_to_sap_order');
+
+    if ($rs->num_rows() > 0)
     {
       return $rs->result();
     }
 
-    return NULL;
-  }
-
-
-  public function count_rows()
-  {
-    return $this->db->where_in('status', array(0, 3))->count_all_results('auto_send_to_sap_order');
-  }
-
-
-  public function get_order_list()
-  {
-    $rs  = $this->db->where_in('status', [0,3])->limit(100)->get('auto_send_to_sap_order');
-
-    if($rs->num_rows() > 0)
-    {
-      return $rs->result();
-    }
-
-    return NULL;
+    return NULL;    
   }
 
 } //--- end class
