@@ -289,8 +289,8 @@ class Orders extends REST_Controller
 
       $role = 'S';
 
-      $doc_date = empty($data->doc_date) ? NULL : db_date($data->doc_date);
-      $due_date = empty($data->due_date) ? NULL : db_date($data->due_date);
+      $doc_date = empty($data->doc_date) ? NULL : db_date($data->doc_date, TRUE);
+      $due_date = empty($data->due_date) ? NULL : db_date($data->due_date, TRUE);
       $date_add = empty($doc_date) ? date('Y-m-d H:i:s') : $doc_date;
 
       $ref_code = $data->order_number;
