@@ -3,17 +3,17 @@ class Lnw_shop_api
 {
   private $url;
   private $token;
-  private $api;  
+  private $api;
   protected $ci;
   public $error;
   public $logs_json = FALSE;
   public $test = FALSE;
-    
+
   public function __construct()
   {
-    $this->ci =& get_instance();    
-		$this->ci->load->model('rest/V1/lnw_shop_api_logs_model');
-    
+    $this->ci = &get_instance();
+    $this->ci->load->model('rest/V1/lnw_shop_api_logs_model');
+
     $this->api = is_true(getConfig('LNW_SHOP_API'));
     $this->token = getConfig('LNW_SHOP_API_CREDENTIAL');
     $this->url = getConfig('LNW_SHOP_API_ENDPOINT');
@@ -24,7 +24,7 @@ class Lnw_shop_api
 
   public function addStock(array $ds = array(), $ref = '', $docType = 'GR')
   {
-    if( ! $this->api)
+    if (! $this->api)
     {
       $this->error = 'LNW SHOP API is not enabled';
       return FALSE;
@@ -34,7 +34,7 @@ class Lnw_shop_api
     $action = 'add-stock';
     $sc = TRUE;
 
-    if( ! empty($ds) && is_array($ds) && ! empty($ref))
+    if (! empty($ds) && is_array($ds) && ! empty($ref))
     {
       $req = array(
         'product_sku' => $ds['product_sku'],
@@ -53,7 +53,7 @@ class Lnw_shop_api
 
       $json = json_encode($req);
 
-      if( ! $this->test)
+      if (! $this->test)
       {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -67,7 +67,7 @@ class Lnw_shop_api
         $error = curl_error($ch);
         curl_close($ch);
 
-        if( ! empty($error))
+        if (! empty($error))
         {
           $sc = FALSE;
           $this->error = $error;
@@ -75,15 +75,15 @@ class Lnw_shop_api
 
         $res = json_decode($response);
 
-        if( ! empty($res) && ! empty($res->status))
+        if (! empty($res) && ! empty($res->status))
         {
-          if($res->status != 'success')
-          {            
+          if ($res->status != 'success')
+          {
             $sc = FALSE;
-            $this->error = $res->error_code.' : '.$res->error_message;
+            $this->error = $res->error_code . ' : ' . $res->error_message;
           }
 
-          if($this->logs_json)
+          if ($this->logs_json)
           {
             $logs = array(
               'trans_id' => genUid(),
@@ -101,13 +101,13 @@ class Lnw_shop_api
             $this->ci->lnw_shop_api_logs_model->add_logs($logs);
           }
         }
-        else 
+        else
         {
           $sc = FALSE;
           $this->error = 'Invalid response from LNW SHOP API';
         }
       }
-      else 
+      else
       {
         if ($this->logs_json)
         {
@@ -125,22 +125,22 @@ class Lnw_shop_api
           );
 
           $this->ci->lnw_shop_api_logs_model->add_logs($logs);
-        }        
-      }        
+        }
+      }
     }
     else
     {
       $sc =  FALSE;
       $this->error = 'Invalid item code or quantity or reference';
     }
-    
+
     return $sc;
   }
 
 
   public function addStockBatch(array $ds = array(), $ref = '', $type = 'GR')
   {
-    if( ! $this->api)
+    if (! $this->api)
     {
       $this->error = 'LNW SHOP API is not enabled';
       return FALSE;
@@ -149,11 +149,11 @@ class Lnw_shop_api
     $action = 'add-stock-batch';
     $sc = TRUE;
 
-    if( ! empty($ds) && is_array($ds))
+    if (! empty($ds) && is_array($ds))
     {
       $req = array('products' => array());
 
-      foreach($ds as $item)
+      foreach ($ds as $item)
       {
         $req['products'][] = array(
           'product_sku' => $item->product_sku,
@@ -161,7 +161,7 @@ class Lnw_shop_api
           'reference_no' => $item->reference_no,
           'detail' => isset($item->detail) ? $item->detail : NULL
         );
-      }      
+      }
 
       $path = '/product/add_stock_batch';
       $url = rtrim($this->url, '/') . $path;
@@ -173,7 +173,7 @@ class Lnw_shop_api
 
       $json = json_encode($req);
 
-      if( ! $this->test)
+      if (! $this->test)
       {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -187,7 +187,7 @@ class Lnw_shop_api
         $error = curl_error($ch);
         curl_close($ch);
 
-        if( ! empty($error))
+        if (! empty($error))
         {
           $sc = FALSE;
           $this->error = $error;
@@ -195,7 +195,7 @@ class Lnw_shop_api
 
         $res = json_decode($response);
 
-        if( ! empty($res) && ! empty($res->status))
+        if (! empty($res) && ! empty($res->status))
         {
           if ($res->status != 'success')
           {
@@ -205,23 +205,20 @@ class Lnw_shop_api
 
           if ($this->logs_json)
           {
-            foreach ($ds as $item)
-            {
-              $logs = array(
-                'trans_id' => genUid(),
-                'type' => $type,
-                'api_path' => $path,
-                'code' => $ref,
-                'ref' => $ref,
-                'action' => $action,
-                'status' => $res->status == 'success' ? 'success' : 'failed',
-                'message' => $res->status == 'success' ? NULL : $this->error,
-                'request_json' => $json,
-                'response_json' => $response
-              );
+            $logs = array(
+              'trans_id' => genUid(),
+              'type' => $type,
+              'api_path' => $path,
+              'code' => $ref,
+              'ref' => $ref,
+              'action' => $action,
+              'status' => $res->status == 'success' ? 'success' : 'failed',
+              'message' => $res->status == 'success' ? NULL : $this->error,
+              'request_json' => $json,
+              'response_json' => $response
+            );
 
-              $this->ci->lnw_shop_api_logs_model->add_logs($logs);
-            }
+            $this->ci->lnw_shop_api_logs_model->add_logs($logs);
           }
         }
         else
@@ -246,7 +243,7 @@ class Lnw_shop_api
             'request_json' => $json,
             'response_json' => NULL
           );
-        
+
           $this->ci->lnw_shop_api_logs_model->add_logs($logs);
         }
       }
@@ -382,7 +379,4 @@ class Lnw_shop_api
 
     return $sc;
   }
-
 } //--- end class
-
-?>

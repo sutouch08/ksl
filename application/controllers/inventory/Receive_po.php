@@ -435,12 +435,15 @@ class Receive_po extends PS_Controller
 
                   $products = [];
 
+                  $arr = explode('-', $doc->code);
+                  $refCode = count($arr) > 1 ? intval($arr[1]) : $doc->code;
+
                   foreach($details as $rs)
                   {
                     $products[] = (object) array(
                       'product_sku' => $rs->product_code,
                       'stock' => intval($rs->receive_qty),
-                      'reference_no' => $doc->code,
+                      'reference_no' => $refCode,
                       'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
                     );
                   }
@@ -517,6 +520,8 @@ class Receive_po extends PS_Controller
 
           $this->db->trans_begin();
           $details = [];
+          $arr = explode('-', $ds->code);
+          $refCode = count($arr) > 1 ? intval($arr[1]) : $ds->code;
 
           if( ! empty($ds->rows))
           {
@@ -570,7 +575,7 @@ class Receive_po extends PS_Controller
                 $details[] = (object) array(
                   'product_sku' => $row->product_code,
                   'receive_qty' => intval($rs->receive_qty),
-                  'reference_no' => $doc->code,
+                  'reference_no' => $refCode,
                   'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
                 );
               }
@@ -967,6 +972,8 @@ class Receive_po extends PS_Controller
             if($sc === TRUE)
             {
               $details = [];
+              $arr = explode('-', $doc->code);
+              $refCode = count($arr) > 1 ? intval($arr[1]) : $doc->code;
 
               foreach($ds->rows as $rs)
               {
@@ -1006,7 +1013,7 @@ class Receive_po extends PS_Controller
                       $details[] = (object) array(
                         'product_sku' => $pd->code,
                         'stock' => intval($rs->qty),
-                        'reference_no' => $doc->code,
+                        'reference_no' => $refCode,
                         'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
                       );
                     }
@@ -1276,13 +1283,15 @@ class Receive_po extends PS_Controller
             $this->load->library('lnw_shop_api');
 
             $products = [];
+            $arr = explode('-', $doc->code);
+            $refCode = count($arr) > 1 ? intval($arr[1]) : $doc->code;
 
             foreach($details as $rs)
             {
               $products[] = (object) array(
                 'product_sku' => $rs->product_code,
                 'stock' => intval($rs->qty),
-                'reference_no' => $code,
+                'reference_no' => $refCode,
                 'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
               );
             }
@@ -1432,13 +1441,15 @@ class Receive_po extends PS_Controller
               if( ! empty($details))
               {
                 $products = [];
+                $arr = explode('-', $code);
+                $refCode = count($arr) > 1 ? intval($arr[1]) : $code;
 
                 foreach($details as $rs)
                 {
                   $products[] = (object) array(
                     'product_sku' => $rs->product_code,
                     'stock' => 0,
-                    'reference_no' => $code,
+                    'reference_no' => $refCode,
                     'detail' => "ย้อนสถานะการรับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
                   );
                 }
@@ -1529,13 +1540,15 @@ class Receive_po extends PS_Controller
       $this->load->library('lnw_shop_api');
 
       $products = [];
+      $arr = explode('-', $doc->code);
+      $refCode = count($arr) > 1 ? intval($arr[1]) : $doc->code;
 
       foreach($details as $rs)
       {
         $products[] = (object) array(
           'product_sku' => $rs->product_code,
           'stock' => intval($rs->receive_qty),
-          'reference_no' => $doc->code,
+          'reference_no' => $refCode,
           'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
         );
       }
@@ -1681,13 +1694,15 @@ class Receive_po extends PS_Controller
               if( ! empty($details))
               {
                 $products = [];
+                $arr = explode('-', $code);
+                $refCode = count($arr) > 1 ? intval($arr[1]) : $code;
 
                 foreach($details as $rs)
                 {
                   $products[] = (object) array(
                     'product_sku' => $rs->product_code,
                     'stock' => 0,
-                    'reference_no' => $code,
+                    'reference_no' => $refCode,
                     'detail' => "ยกเลิกการรับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
                   );
                 }
