@@ -5,7 +5,6 @@ function addNew(){
 }
 
 
-
 function goBack(){
   window.location.href = HOME;
 }
@@ -13,6 +12,10 @@ function goBack(){
 
 function getEdit(id){
 	window.location.href = HOME + 'edit/'+id;
+}
+
+function viewDetail(id) {
+	window.location.href = HOME + 'view_detail/' + id;
 }
 
 

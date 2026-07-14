@@ -44,7 +44,6 @@ class Receive_po extends PS_Controller
       'must_accept' => get_filter('must_accept', 'receive_must_accept', 'all')
     );
 
-
     if($this->input->post('search'))
     {
       redirect($this->home);
@@ -440,8 +439,25 @@ class Receive_po extends PS_Controller
 
                   foreach($details as $rs)
                   {
+                    $pdCode = $rs->product_code;
+                    $item = $this->products_model->get($pdCode);
+                    
+                    if(empty($item->old_code) OR $item->old_code == $pdCode)
+                    {
+                      $altCode = $this->products_model->get_last_alt_code($pdCode);
+
+                      if( ! empty($altCode))
+                      {
+                        $pdCode = $altCode;
+                      }
+                    }
+                    else 
+                    {
+                      $pdCode = $item->old_code;
+                    }
+
                     $products[] = (object) array(
-                      'product_sku' => $rs->product_code,
+                      'product_sku' => $pdCode,
                       'stock' => intval($rs->receive_qty),
                       'reference_no' => $refCode,
                       'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
@@ -517,6 +533,11 @@ class Receive_po extends PS_Controller
         if($doc->status == 3)
         {
           $shipped_date = getConfig('ORDER_SOLD_DATE') == 'D' ? db_date($doc->date_add, TRUE) : (empty($doc->shipped_date) ? $doc->shipped_date : now());
+          //--export stock to LNW SHOP
+          $lnwWhs = getConfig('LNW_SHOP_WAREHOUSE');
+          $lnwApi = is_true(getConfig('LNW_SHOP_API'));
+          $syncStock = is_true(getConfig('SYNC_LNW_SHOP_STOCK'));
+          $lnwExport = ($lnwApi && $syncStock && $doc->warehouse_code == $lnwWhs) ? TRUE : FALSE;
 
           $this->db->trans_begin();
           $details = [];
@@ -572,12 +593,32 @@ class Receive_po extends PS_Controller
                   }
                 }
 
-                $details[] = (object) array(
-                  'product_sku' => $row->product_code,
-                  'receive_qty' => intval($rs->receive_qty),
-                  'reference_no' => $refCode,
-                  'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
-                );
+                if($lnwExport)
+                {
+                  $pdCode = $row->product_code;
+                  $item = $this->products_model->get($pdCode);
+
+                  if(empty($item->old_code) OR $item->old_code == $pdCode)
+                  {
+                    $altCode = $this->products_model->get_last_alt_code($pdCode);
+
+                    if( ! empty($altCode))
+                    {
+                      $pdCode = $altCode;
+                    }
+                  }
+                  else 
+                  {
+                    $pdCode = $item->old_code;
+                  }
+
+                  $details[] = (object) array(
+                    'product_sku' => $pdCode,
+                    'receive_qty' => intval($rs->receive_qty),
+                    'reference_no' => $refCode,
+                    'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
+                  );
+                }
               }
               else
               {
@@ -616,27 +657,18 @@ class Receive_po extends PS_Controller
           {
             $this->error = "";
 
-            //--export stock to LNW SHOP
-            $lnwWhs = getConfig('LNW_SHOP_WAREHOUSE');
-
-            if($doc->warehouse_code == $lnwWhs)
+            if ($lnwExport && ! empty($details))
             {
-              $lnwApi = is_true(getConfig('LNW_SHOP_API'));
-              $syncStock = is_true(getConfig('SYNC_LNW_SHOP_STOCK'));
+              $this->load->library('lnw_shop_api');
 
-              if($lnwApi && $syncStock && ! empty($details))
+              if (! $this->lnw_shop_api->addStockBatch($details, $doc->code, 'GR'))
               {
-                $this->load->library('lnw_shop_api');
-
-                if( ! $this->lnw_shop_api->addStockBatch($details, $doc->code, 'GR'))
-                {
-                  $sc = FALSE;
-                  $ex = 0;
-                  $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> ".trim($this->lnw_shop_api->error).'<br/>';
-                }
-
-                $this->receive_po_model->update($doc->code, ['lnw_export' => $sc === TRUE ? 1 : 3]);
+                $sc = FALSE;
+                $ex = 0;
+                $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . trim($this->lnw_shop_api->error) . '<br/>';
               }
+
+              $this->receive_po_model->update($doc->code, ['lnw_export' => $sc === TRUE ? 1 : 3]);
             }
 
             //-- export to SAP
@@ -911,6 +943,7 @@ class Receive_po extends PS_Controller
       $this->load->model('inventory/movement_model');
 
       $doc = $this->receive_po_model->get($ds->code);
+      $lnwExport = ($lnwApi && $syncStock && $doc->warehouse_code == $lnwWhs) ? TRUE : FALSE;
 
       $movement_date = getConfig('ORDER_SOLD_DATE') == 'D' ? db_date($ds->doc_date, TRUE) : now();
 
@@ -1008,10 +1041,26 @@ class Receive_po extends PS_Controller
                       'vatRate' => $rs->vatRate
                     );
 
-                    if($must_accept == 0 && $lnwApi && $syncStock && $ds->save_type != 0)
+                    if($must_accept == 0 && $lnwExport && $ds->save_type != 0)
                     {
+                      $pdCode = $pd->code;
+
+                      if(empty($pd->old_code) OR $pd->old_code == $pdCode)
+                      {
+                        $altCode = $this->products_model->get_last_alt_code($pdCode);
+
+                        if( ! empty($altCode))
+                        {
+                          $pdCode = $altCode;
+                        }
+                      }
+                      else 
+                      {
+                        $pdCode = $pd->old_code;
+                      }
+
                       $details[] = (object) array(
-                        'product_sku' => $pd->code,
+                        'product_sku' => $pdCode,
                         'stock' => intval($rs->qty),
                         'reference_no' => $refCode,
                         'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
@@ -1087,7 +1136,7 @@ class Receive_po extends PS_Controller
           {       
             $this->error = "";
 
-            if($zone->warehouse_code == $lnwWhs && $lnwApi && $syncStock && ! empty($details))
+            if($lnwExport && ! empty($details))
             {
               $this->load->library('lnw_shop_api');
 
@@ -1288,8 +1337,25 @@ class Receive_po extends PS_Controller
 
             foreach($details as $rs)
             {
+              $pdCode = $rs->product_code;
+              $item = $this->products_model->get($pdCode);
+
+              if(empty($item->old_code) OR $item->old_code == $pdCode)
+              {
+                $altCode = $this->products_model->get_last_alt_code($pdCode);
+
+                if( ! empty($altCode))
+                {
+                  $pdCode = $altCode;
+                }
+              }
+              else 
+              {
+                $pdCode = $item->old_code;
+              }
+
               $products[] = (object) array(
-                'product_sku' => $rs->product_code,
+                'product_sku' => $pdCode,
                 'stock' => intval($rs->qty),
                 'reference_no' => $refCode,
                 'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
@@ -1446,8 +1512,25 @@ class Receive_po extends PS_Controller
 
                 foreach($details as $rs)
                 {
+                  $pdCode = $rs->product_code;
+                  $item = $this->products_model->get($pdCode);
+
+                  if(empty($item->old_code) OR $item->old_code == $pdCode)
+                  {
+                    $altCode = $this->products_model->get_last_alt_code($pdCode);
+
+                    if( ! empty($altCode))
+                    {
+                      $pdCode = $altCode;
+                    }
+                  }
+                  else 
+                  {
+                    $pdCode = $item->old_code;
+                  }
+
                   $products[] = (object) array(
-                    'product_sku' => $rs->product_code,
+                    'product_sku' => $pdCode,
                     'stock' => 0,
                     'reference_no' => $refCode,
                     'detail' => "ย้อนสถานะการรับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
@@ -1584,7 +1667,6 @@ class Receive_po extends PS_Controller
 
     $this->_response($sc);
   }
-
   
 
   public function do_export($code)
@@ -1716,8 +1798,25 @@ class Receive_po extends PS_Controller
 
                 foreach($details as $rs)
                 {
+                  $pdCode = $rs->product_code;
+                  $item = $this->products_model->get($pdCode);
+
+                  if(empty($item->old_code) OR $item->old_code == $pdCode)
+                  {
+                    $altCode = $this->products_model->get_last_alt_code($pdCode);
+
+                    if( ! empty($altCode))
+                    {
+                      $pdCode = $altCode;
+                    }
+                  }
+                  else 
+                  {
+                    $pdCode = $item->old_code;
+                  }
+
                   $products[] = (object) array(
-                    'product_sku' => $rs->product_code,
+                    'product_sku' => $pdCode,
                     'stock' => 0,
                     'reference_no' => $refCode,
                     'detail' => "ยกเลิกการรับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"

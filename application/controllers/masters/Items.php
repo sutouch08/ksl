@@ -101,6 +101,21 @@ class Items extends PS_Controller
   }
 
 
+  public function view_detail($id)
+  {
+    $item = $this->products_model->get_by_id($id);
+
+    if (! empty($item))
+    {
+      $this->load->view('masters/product_items/items_view_detail', $item);
+    }
+    else
+    {
+      $this->page_error();
+    }
+  }
+  
+
   public function import_items()
   {
     $sc = TRUE;
