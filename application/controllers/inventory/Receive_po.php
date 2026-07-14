@@ -1545,8 +1545,25 @@ class Receive_po extends PS_Controller
 
       foreach($details as $rs)
       {
+        $pdCode = $rs->product_code;
+        $item = $this->products_model->get($pdCode);
+
+        if(empty($item->old_code) OR $item->old_code == $pdCode)
+        {
+          $altCode = $this->products_model->get_last_alt_code($pdCode);
+
+          if( ! empty($altCode))
+          {
+            $pdCode = $altCode;
+          }
+        }
+        else 
+        {
+          $pdCode = $item->old_code;
+        }
+        
         $products[] = (object) array(
-          'product_sku' => $rs->product_code,
+          'product_sku' => $pdCode,
           'stock' => intval($rs->receive_qty),
           'reference_no' => $refCode,
           'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"

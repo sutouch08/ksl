@@ -325,23 +325,20 @@ class Lnw_shop_api
 
           if ($this->logs_json)
           {
-            foreach ($ds as $item)
-            {
-              $logs = array(
-                'trans_id' => genUid(),
-                'type' => $type,
-                'api_path' => $path,
-                'code' => $ref,
-                'ref' => $ref,
-                'action' => $action,
-                'status' => $res->status == 'success' ? 'success' : 'failed',
-                'message' => $res->status == 'success' ? NULL : $this->error,
-                'request_json' => $json,
-                'response_json' => $response
-              );
+            $logs = array(
+              'trans_id' => genUid(),
+              'type' => $type,
+              'api_path' => $path,
+              'code' => $ref,
+              'ref' => $ref,
+              'action' => $action,
+              'status' => $res->status == 'success' ? 'success' : 'failed',
+              'message' => $res->status == 'success' ? NULL : $this->error,
+              'request_json' => $json,
+              'response_json' => $response
+            );
 
-              $this->ci->lnw_shop_api_logs_model->add_logs($logs);
-            }
+            $this->ci->lnw_shop_api_logs_model->add_logs($logs);
           }
         }
         else

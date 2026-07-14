@@ -44,7 +44,6 @@ class Products_model extends CI_Model
   }
 
 
-
   public function get_sap_list($date_add, $date_upd, $limit, $offset)
   {
     $rs = $this->ms
@@ -68,7 +67,6 @@ class Products_model extends CI_Model
 
     return FALSE;
   }
-
 
 
   public function is_middle_exists($code)
@@ -101,7 +99,6 @@ class Products_model extends CI_Model
 
     return NULL;
   }
-
 
 
   public function drop_middle_item($docEntry)
@@ -265,7 +262,6 @@ class Products_model extends CI_Model
   }
 
 
-
   public function get_list(array $ds = array(), $perpage = '', $offset = '')
   {
     $this->db
@@ -400,7 +396,6 @@ class Products_model extends CI_Model
 
     return $rs->result();
   }
-
 
 
   public function get_products_list(array $ds = array())
@@ -542,8 +537,6 @@ class Products_model extends CI_Model
   }
 
 
-
-
   public function add(array $ds = array())
   {
     if(!empty($ds))
@@ -553,7 +546,6 @@ class Products_model extends CI_Model
 
     return FALSE;
   }
-
 
   //--- Export item to SAP
   public function add_item(array $ds = array())
@@ -565,7 +557,6 @@ class Products_model extends CI_Model
 
     return FALSE;
   }
-
 
   //--- Export item tot SAP
   public function update_item($code, array $ds = array())
@@ -602,9 +593,6 @@ class Products_model extends CI_Model
   }
 
 
-
-
-
   public function get_status($field, $id)
   {
     $rs = $this->db->select($field)->where('id', $id)->get('products');
@@ -615,7 +603,6 @@ class Products_model extends CI_Model
 
     return 0;
   }
-
 
 
   public function get_barcode($code)
@@ -630,7 +617,6 @@ class Products_model extends CI_Model
   }
 
 
-
   public function get_product_by_barcode($barcode)
   {
     $rs = $this->db->where('barcode', $barcode)->get('products');
@@ -641,8 +627,6 @@ class Products_model extends CI_Model
 
     return NULL;
   }
-
-
 
 
   public function set_status($field, $id, $val)
@@ -663,7 +647,6 @@ class Products_model extends CI_Model
   }
 
 
-
   public function get($code)
   {
     $rs = $this->db->where('code', $code)->get('products');
@@ -675,6 +658,7 @@ class Products_model extends CI_Model
 
     return NULL;
   }
+
 
   public function get_by_id($id)
   {
@@ -691,14 +675,14 @@ class Products_model extends CI_Model
   //---
   public function get_item($code)
   {
-      $rs = $this->db->where('code', $code)->get('products');
+     $rs = $this->db->where('code', $code)->get('products');
 
-      if($rs->num_rows() === 1)
-      {
-        return $rs->row();
-      }
+     if($rs->num_rows() === 1)
+     {
+       return $rs->row();
+     }
 
-      return NULL;
+     return NULL;
   }
 
 
@@ -708,9 +692,8 @@ class Products_model extends CI_Model
 
     if($rs->num_rows() > 0)
     {
-      return $rs->row(); //$rs->num_rows() == 1 ? $rs->row() : $rs->result();
+      return $rs->row(); 
     }
-
 
     return NULL;
   }
@@ -759,7 +742,6 @@ class Products_model extends CI_Model
   }
 
 
-
   public function get_style_code($code)
   {
     $rs = $this->db->select('style_code')->where('code', $code)->get('products');
@@ -770,7 +752,6 @@ class Products_model extends CI_Model
 
     return NULL;
   }
-
 
 
   public function get_data($ds, $perpage = '', $offset = '')
@@ -800,7 +781,6 @@ class Products_model extends CI_Model
   }
 
 
-
   public function get_style_items($code)
   {
     $this->db
@@ -822,7 +802,6 @@ class Products_model extends CI_Model
   }
 
 
-
   public function get_items_by_color($style, $color)
   {
     $rs = $this->db->where('style_code', $style)->where('color_code', $color)->get('products');
@@ -833,8 +812,6 @@ class Products_model extends CI_Model
 
     return array();
   }
-
-
 
 
   public function get_item_by_color_and_size($style, $color, $size)
@@ -853,8 +830,6 @@ class Products_model extends CI_Model
 
     return array();
   }
-
-
 
 
   public function countAttribute($style_code)
@@ -880,14 +855,11 @@ class Products_model extends CI_Model
   }
 
 
-
   public function update_barcode($code, $barcode)
   {
     $this->db->set('barcode', $barcode);
     return $this->db->where('code', $code)->update('products');
   }
-
-
 
 
   public function is_exists($code, $old_code = '')
@@ -908,7 +880,6 @@ class Products_model extends CI_Model
   }
 
 
-
   public function is_exists_name($name, $old_name = '')
   {
     if($old_name != '')
@@ -925,7 +896,6 @@ class Products_model extends CI_Model
 
     return FALSE;
   }
-
 
 
   public function is_count_stock($code)
@@ -953,8 +923,6 @@ class Products_model extends CI_Model
   }
 
 
-
-
   public function is_disactive_all($style_code)
   {
     $this->db->select('code')->where('style_code', $style_code)->where('active', 1);
@@ -966,8 +934,6 @@ class Products_model extends CI_Model
 
     return TRUE;
   }
-
-
 
 
   public function count_color($style_code)
@@ -983,7 +949,6 @@ class Products_model extends CI_Model
   }
 
 
-
   public function count_size($style_code)
   {
     $this->db->select('size_code')
@@ -995,7 +960,6 @@ class Products_model extends CI_Model
 
     return $rs->num_rows();
   }
-
 
 
   public function get_all_colors($style_code)
@@ -1049,8 +1013,6 @@ class Products_model extends CI_Model
   }
 
 
-
-
   public function update_cost_price_by_size($code, $size, $cost, $price)
   {
     if(!empty($code))
@@ -1081,7 +1043,6 @@ class Products_model extends CI_Model
 
     return NULL;
   }
-
 
 
   public function has_transection($code)
@@ -1147,6 +1108,24 @@ class Products_model extends CI_Model
   }
 
 
+  public function get_last_alt_code($code)
+  {
+    $rs = $this->db
+    ->select('alt_code')
+    ->where('product_code', $code)
+    ->order_by('id', 'DESC')
+    ->limit(1)
+    ->get('product_alt_code');
+
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row()->alt_code;
+    }
+
+    return NULL;
+  }
+
+
   public function add_alt_code(array $ds = array())
   {
     if( ! empty($ds))
@@ -1162,6 +1141,6 @@ class Products_model extends CI_Model
   {
     return $this->db->where('product_code', $code)->delete('product_alt_code');
   }
-
+  
 }
 ?>
