@@ -183,7 +183,12 @@ else
 						<?php $red = ($rs->qty == $rs->receive_qty) ? '' : 'red'; ?>
 						<tr class="font-size-12 <?php echo $red; ?>">
 							<td class="middle text-center"><?php echo $no; ?></td>
-							<td class="middle"><?php echo $rs->product_code; ?></td>
+							<td class="middle">
+								<?php if($rs->lnw_status == 3) : ?>
+									<i class="fa fa-exclamation-triangle red" title="มีปัญหาเกี่ยวกับสินค้าใน LNW SHOP : <?php echo $rs->lnw_error; ?>" style="margin-right:5px;"></i>
+								<?php endif; ?>
+								<?php echo $rs->product_code; ?>
+							</td>
 							<td class="middle"><?php echo $rs->product_name; ?></td>
 							<td class="middle text-right"><?php echo number($rs->price, 2); ?></td>
 							<td class="middle text-right"><?php echo number($rs->qty); ?></td>
