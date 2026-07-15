@@ -27,7 +27,8 @@
 			<select class="form-control input-sm" name="status" onchange="getSearch()">
 				<option value="all">All</option>
 				<option value="success" <?php echo is_selected('success', $status); ?>>Success</option>
-				<option value="failed" <?php echo is_selected('failed', $status); ?>>Failed</option>				
+				<option value="partial" <?php echo is_selected('partial', $status); ?>>Partial</option>
+				<option value="failed" <?php echo is_selected('failed', $status); ?>>Failed</option>
 				<option value="test" <?php echo is_selected('test', $status); ?>>Test</option>
 			</select>
 		</div>
@@ -36,8 +37,7 @@
 			<label>Type</label>
 			<select class="form-control input-sm" name="type" onchange="getSearch()">
 				<option value="all">ทั้งหมด</option>
-				<option value="GR" <?php echo is_selected('GR', $type); ?>>GR | Goods Receipt</option>
-				<option value="AJ" <?php echo is_selected('AJ', $type); ?>>AJ | Adjustment</option>
+				<option value="GR" <?php echo is_selected('GR', $type); ?>>GR | Goods Receipt</option>				
 			</select>
 		</div>
 
@@ -45,7 +45,8 @@
 			<label>Action</label>
 			<select class="form-control input-sm" name="action" onchange="getSearch()">
 				<option value="all">All</option>
-				<option value="add-stock" <?php echo is_selected('add-stock', $action); ?>>Add stock</option>
+				<option value="add-stock-batch" <?php echo is_selected('add-stock-batch', $action); ?>>add-stock-batch</option>
+				<option value="cancel-stock-batch" <?php echo is_selected('cancel-stock-batch', $action); ?>>cancel-stock-batch</option>
 			</select>
 		</div>
 
