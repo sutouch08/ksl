@@ -162,6 +162,7 @@ class Lnw_shop_api
       'status' => $sc == TRUE ? 'success' : ($request_status == 2 ? 'partial' : 'error'),
       'message' => $sc === TRUE ? 'success' : $this->error,
       'request_status' => $request_status,
+      'test' => $this->test,
       'error_products' => $error_products
     );
 
@@ -309,6 +310,7 @@ class Lnw_shop_api
       'status' => $sc == TRUE ? 'success' : ($request_status == 2 ? 'partial' : 'error'),
       'message' => $sc === TRUE ? 'success' : $this->error,
       'request_status' => $request_status,
+      'test' => $this->test,
       'error_products' => $error_products
     );
 

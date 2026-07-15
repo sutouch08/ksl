@@ -1475,6 +1475,11 @@ class Receive_po extends PS_Controller
 
         if (is_array($result))
         {
+          if($result['test'] === TRUE)
+          {
+            return TRUE;
+          }
+
           if ($result['status'] == 'success')
           {
             foreach ($rows as $row)
