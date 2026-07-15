@@ -259,11 +259,11 @@ function doExport(){
 }
 
 
-function sendToLnwShop() {
+function sendToLnwShop(isCancel = 0) {
 	let code = $('#receive_code').val();
 	load_in();
 	$.ajax({
-		url: HOME + 'send_to_lnw_shop/'+code,
+		url: HOME + 'send_to_lnw_shop/'+code+'/'+isCancel,
 		type:'POST',
 		success:function(rs) {
 			load_out();

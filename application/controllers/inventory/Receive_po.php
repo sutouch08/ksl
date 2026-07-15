@@ -1,12 +1,12 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 class Receive_po extends PS_Controller
 {
   public $menu_code = 'ICPURC';
-	public $menu_group_code = 'IC';
+  public $menu_group_code = 'IC';
   public $menu_sub_group_code = 'RECEIVE';
-	public $title = 'รับสินค้าจากการซื้อ';
+  public $title = 'รับสินค้าจากการซื้อ';
   public $filter;
   public $error;
   public $required_remark = 0;
@@ -15,7 +15,7 @@ class Receive_po extends PS_Controller
   public function __construct()
   {
     parent::__construct();
-    $this->home = base_url().'inventory/receive_po';
+    $this->home = base_url() . 'inventory/receive_po';
     $this->load->model('inventory/receive_po_model');
     $this->load->model('stock/stock_model');
     $this->load->model('orders/orders_model');
@@ -44,7 +44,7 @@ class Receive_po extends PS_Controller
       'must_accept' => get_filter('must_accept', 'receive_must_accept', 'all')
     );
 
-    if($this->input->post('search'))
+    if ($this->input->post('search'))
     {
       redirect($this->home);
     }
@@ -56,12 +56,12 @@ class Receive_po extends PS_Controller
       $segment  = 4; //-- url segment
       $rows     = $this->receive_po_model->count_rows($filter);
       //--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
-      $init	    = pagination_config($this->home.'/index/', $rows, $perpage, $segment);
+      $init      = pagination_config($this->home . '/index/', $rows, $perpage, $segment);
       $document = $this->receive_po_model->get_list($filter, $perpage, $this->uri->segment($segment));
 
-      if(!empty($document))
+      if (!empty($document))
       {
-        foreach($document as $rs)
+        foreach ($document as $rs)
         {
           $rs->qty = $this->receive_po_model->get_sum_qty($rs->code);
         }
@@ -71,7 +71,7 @@ class Receive_po extends PS_Controller
 
       $this->pagination->initialize($init);
 
-      if($this->is_mobile)
+      if ($this->is_mobile)
       {
         $this->load->view('inventory/receive_po/mobile/receive_po_list_mobile', $filter);
       }
@@ -87,19 +87,19 @@ class Receive_po extends PS_Controller
   {
     $this->load->model('masters/zone_model');
     $this->load->helper('warehouse');
-		$this->load->helper('currency');
+    $this->load->helper('currency');
 
     $doc = $this->receive_po_model->get($code);
 
-    if( ! empty($doc))
+    if (! empty($doc))
     {
-      if($doc->status == 3)
+      if ($doc->status == 3)
       {
         $details = $this->receive_po_model->get_details($code);
 
-        if( ! empty($details))
+        if (! empty($details))
         {
-          foreach($details as $rs)
+          foreach ($details as $rs)
           {
             $rs->barcode = $this->products_model->get_barcode($rs->product_code);
           }
@@ -130,22 +130,22 @@ class Receive_po extends PS_Controller
   {
     $this->load->model('masters/zone_model');
     $this->load->helper('warehouse');
-		$this->load->helper('currency');
+    $this->load->helper('currency');
 
     $doc = $this->receive_po_model->get($code);
 
-    if( ! empty($doc))
+    if (! empty($doc))
     {
-      if($doc->status == 3)
+      if ($doc->status == 3)
       {
         $totalQty = 0;
         $totalReceive = 0;
 
         $uncomplete = $this->receive_po_model->get_in_complete_list($code);
 
-        if(!empty($uncomplete))
+        if (!empty($uncomplete))
         {
-          foreach($uncomplete as $rs)
+          foreach ($uncomplete as $rs)
           {
             $rs->barcode = $this->products_model->get_barcode($rs->product_code);
             $totalQty += $rs->qty;
@@ -155,9 +155,9 @@ class Receive_po extends PS_Controller
 
         $complete = $this->receive_po_model->get_complete_list($code);
 
-        if( ! empty($complete))
+        if (! empty($complete))
         {
-          foreach($complete as $rs)
+          foreach ($complete as $rs)
           {
             $rs->barcode = $this->products_model->get_barcode($rs->product_code);
             $totalQty += $rs->qty;
@@ -166,7 +166,7 @@ class Receive_po extends PS_Controller
         }
 
         $ds = array(
-          'title' => $doc->code . "  [PO{$doc->po_code}]"  . "<br/>".$doc->vendor_name,
+          'title' => $doc->code . "  [PO{$doc->po_code}]"  . "<br/>" . $doc->vendor_name,
           'doc' => $doc,
           'uncomplete' => $uncomplete,
           'complete' => $complete,
@@ -196,36 +196,36 @@ class Receive_po extends PS_Controller
     $sc = TRUE;
     $ds = json_decode($this->input->post('data'));
 
-    if( ! empty($ds) && ! empty($ds->code) && ! empty($ds->rows))
+    if (! empty($ds) && ! empty($ds->code) && ! empty($ds->rows))
     {
       $doc = $this->receive_po_model->get($ds->code);
 
-      if( ! empty($doc))
+      if (! empty($doc))
       {
-        if($doc->status == 3)
+        if ($doc->status == 3)
         {
           $this->db->trans_begin();
 
-          foreach($ds->rows as $rs)
+          foreach ($ds->rows as $rs)
           {
-            if($sc === FALSE)
+            if ($sc === FALSE)
             {
               break;
             }
 
             $detail = $this->receive_po_model->get_detail($rs->id);
 
-            if( ! empty($detail))
+            if (! empty($detail))
             {
               $newQty = $rs->qty + $detail->receive_qty;
 
-              if($detail->qty < $newQty)
+              if ($detail->qty < $newQty)
               {
                 $sc = FALSE;
                 $this->error = "{$detail->product_code} : จำนวนที่รับ เกินจำนวนที่ส่ง กรุณาตรวจสอบ <br/> จำนวนส่ง : {$detail->qty}<br/>รับแล้ว : {$detail->receive_qty}<br/>บันทึกเพิ่ม : {$rs->qty}";
               }
 
-              if($sc === TRUE)
+              if ($sc === TRUE)
               {
                 $af = $detail->before_backlogs - $newQty;  //--- ยอดค้างรับหลังรับแล้ว
                 $amount = round($newQty * $detail->price, 6);
@@ -237,7 +237,7 @@ class Receive_po extends PS_Controller
                   'valid' => $detail->qty <= $newQty ? 1 : 0
                 );
 
-                if( ! $this->receive_po_model->update_detail($rs->id, $arr))
+                if (! $this->receive_po_model->update_detail($rs->id, $arr))
                 {
                   $sc = FALSE;
                   $this->error = "Failed to update receive qty at {$detail->product_code}";
@@ -251,7 +251,7 @@ class Receive_po extends PS_Controller
             }
           }
 
-          if($sc === TRUE)
+          if ($sc === TRUE)
           {
             $this->db->trans_commit();
           }
@@ -289,38 +289,38 @@ class Receive_po extends PS_Controller
     $ex = 1;
     $ds = json_decode($this->input->post('data'));
 
-    if( ! empty($ds) && ! empty($ds->code))
+    if (! empty($ds) && ! empty($ds->code))
     {
       $doc = $this->receive_po_model->get($ds->code);
 
-      if( ! empty($doc))
+      if (! empty($doc))
       {
-        if($doc->status == 3)
+        if ($doc->status == 3)
         {
-          if( ! empty($ds->rows))
+          if (! empty($ds->rows))
           {
             $this->db->trans_begin();
 
-            foreach($ds->rows as $rs)
+            foreach ($ds->rows as $rs)
             {
-              if($sc === FALSE)
+              if ($sc === FALSE)
               {
                 break;
               }
 
               $detail = $this->receive_po_model->get_detail($rs->id);
 
-              if( ! empty($detail))
+              if (! empty($detail))
               {
                 $newQty = $rs->qty + $detail->receive_qty;
 
-                if($detail->qty < $newQty)
+                if ($detail->qty < $newQty)
                 {
                   $sc = FALSE;
                   $this->error = "{$detail->product_code} : จำนวนที่รับ เกินจำนวนที่ส่ง กรุณาตรวจสอบ <br/> จำนวนส่ง : {$detail->qty}<br/>รับแล้ว : {$detail->receive_qty}<br/>บันทึกเพิ่ม : {$rs->qty}";
                 }
 
-                if($sc === TRUE)
+                if ($sc === TRUE)
                 {
                   $af = $detail->before_backlogs - $newQty;  //--- ยอดค้างรับหลังรับแล้ว
                   $amount = round($newQty * $detail->price, 6);
@@ -332,7 +332,7 @@ class Receive_po extends PS_Controller
                     'valid' => $detail->qty <= $newQty ? 1 : 0
                   );
 
-                  if( ! $this->receive_po_model->update_detail($rs->id, $arr))
+                  if (! $this->receive_po_model->update_detail($rs->id, $arr))
                   {
                     $sc = FALSE;
                     $this->error = "Failed to update receive qty at {$detail->product_code}";
@@ -346,7 +346,7 @@ class Receive_po extends PS_Controller
               }
             }
 
-            if($sc === TRUE)
+            if ($sc === TRUE)
             {
               $this->db->trans_commit();
             }
@@ -356,21 +356,21 @@ class Receive_po extends PS_Controller
             }
           }
 
-          if($sc === TRUE)
+          if ($sc === TRUE)
           {
             $this->db->trans_begin();
 
             $details = $this->receive_po_model->get_details($ds->code);
 
-            if( ! empty($details))
+            if (! empty($details))
             {
               $this->load->model('inventory/movement_model');
 
               $movement_date = getConfig('ORDER_SOLD_DATE') == 'D' ? db_date($ds->doc_date, TRUE) : now();
 
-              foreach($details as $rs)
+              foreach ($details as $rs)
               {
-                if($sc === FALSE)
+                if ($sc === FALSE)
                 {
                   break;
                 }
@@ -385,7 +385,7 @@ class Receive_po extends PS_Controller
                   'date_add' => $movement_date
                 );
 
-                if( ! $this->movement_model->add($arr))
+                if (! $this->movement_model->add($arr))
                 {
                   $sc = FALSE;
                   $this->error = "Insert Movement Failed";
@@ -393,22 +393,22 @@ class Receive_po extends PS_Controller
               }
             }
 
-            if($sc === TRUE)
-            {              
+            if ($sc === TRUE)
+            {
               $arr = array(
                 'status' => 1,
                 'shipped_date' => empty($doc->shipped_date) ? now() : $doc->shipped_date,
                 'update_user' => $this->_user->uname
               );
 
-              if( ! $this->receive_po_model->update($doc->code, $arr))
+              if (! $this->receive_po_model->update($doc->code, $arr))
               {
                 $sc = FALSE;
                 $this->error = "Failed to close document";
               }
             }
 
-            if($sc === TRUE)
+            if ($sc === TRUE)
             {
               $this->db->trans_commit();
             }
@@ -417,65 +417,24 @@ class Receive_po extends PS_Controller
               $this->db->trans_rollback();
             }
 
-            if($sc === TRUE)
+            if ($sc === TRUE)
             {
               $this->error = "";
-
               $lnwWhs = getConfig('LNW_SHOP_WAREHOUSE');
 
-              if($doc->warehouse_code == $lnwWhs)
+              if ($doc->warehouse_code == $lnwWhs)
               {
                 $lnwApi = is_true(getConfig('LNW_SHOP_API'));
                 $syncStock = is_true(getConfig('SYNC_LNW_SHOP_STOCK'));
 
-                if($lnwApi && $syncStock && ! empty($details))
-                {
-                  $this->load->library('lnw_shop_api');
-
-                  $products = [];
-
-                  $arr = explode('-', $doc->code);
-                  $refCode = count($arr) > 1 ? intval($arr[1]) : $doc->code;
-
-                  foreach($details as $rs)
+                if ($lnwApi && $syncStock && ! empty($details))
+                {                  
+                  if (! $this->lnw_export($doc->code))
                   {
-                    $pdCode = $rs->product_code;
-                    $item = $this->products_model->get($pdCode);
-                    
-                    if(empty($item->old_code) OR $item->old_code == $pdCode)
-                    {
-                      $altCode = $this->products_model->get_last_alt_code($pdCode);
-
-                      if( ! empty($altCode))
-                      {
-                        $pdCode = $altCode;
-                      }
-                    }
-                    else 
-                    {
-                      $pdCode = $item->old_code;
-                    }
-
-                    $products[] = (object) array(
-                      'product_sku' => $pdCode,
-                      'stock' => intval($rs->receive_qty),
-                      'reference_no' => $refCode,
-                      'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
-                    );
+                    $sc = FALSE;
+                    $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . $this->error . '<br/>';
                   }
-
-                  if( ! empty($products))
-                  {
-                    if( ! $this->lnw_shop_api->addStockBatch($products, $doc->code, 'GR'))
-                    {
-                      $sc = FALSE;
-                      $ex = 0;
-                      $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> ".trim($this->lnw_shop_api->error).'<br/>';
-                    }
-
-                    $this->receive_po_model->update($doc->code, ['lnw_export' => $sc === TRUE ? 1 : 3]);
-                  }
-                }                                
+                }
               }
 
               //--- export to SAP
@@ -487,7 +446,7 @@ class Receive_po extends PS_Controller
                 $ex = 0;
                 $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า SAP ไม่สำเร็จ <br/> " . trim($this->export->error) . '<br/>';
               }
-            }            
+            }
           }
         }
         else
@@ -524,13 +483,13 @@ class Receive_po extends PS_Controller
     $ex = 1;
     $ds = json_decode($this->input->post('data'));
 
-    if( ! empty($ds))
+    if (! empty($ds))
     {
       $doc = $this->receive_po_model->get($ds->code);
 
-      if( ! empty($doc))
+      if (! empty($doc))
       {
-        if($doc->status == 3)
+        if ($doc->status == 3)
         {
           $shipped_date = getConfig('ORDER_SOLD_DATE') == 'D' ? db_date($doc->date_add, TRUE) : (empty($doc->shipped_date) ? $doc->shipped_date : now());
           //--export stock to LNW SHOP
@@ -544,21 +503,20 @@ class Receive_po extends PS_Controller
           $arr = explode('-', $ds->code);
           $refCode = count($arr) > 1 ? intval($arr[1]) : $ds->code;
 
-          if( ! empty($ds->rows))
+          if (! empty($ds->rows))
           {
-            foreach($ds->rows as $rs)
+            foreach ($ds->rows as $rs)
             {
-              if($sc === FALSE)
+              if ($sc === FALSE)
               {
                 break;
               }
 
               $row = $this->receive_po_model->get_detail($rs->id);
 
-              if( ! empty($row))
+              if (! empty($row))
               {
                 $amount = $row->price * $rs->receive_qty;
-                $after_backlogs = $row->before_backlogs - $rs->receive_qty;
                 $valid = $row->qty <= $rs->receive_qty ? 1 : 0;
 
                 $arr = array(
@@ -567,13 +525,13 @@ class Receive_po extends PS_Controller
                   'valid' => $valid
                 );
 
-                if( ! $this->receive_po_model->update_detail($rs->id, $arr))
+                if (! $this->receive_po_model->update_detail($rs->id, $arr))
                 {
                   $sc = FALSE;
                   $this->error = "Failed to update item row";
                 }
 
-                if($sc === TRUE)
+                if ($sc === TRUE)
                 {
                   //--- insert Movement in
                   $arr = array(
@@ -586,39 +544,12 @@ class Receive_po extends PS_Controller
                     'date_add' => $shipped_date
                   );
 
-                  if( ! $this->movement_model->add($arr))
+                  if (! $this->movement_model->add($arr))
                   {
                     $sc = FALSE;
                     $this->error = "Failed to create movemnt";;
                   }
-                }
-
-                if($lnwExport)
-                {
-                  $pdCode = $row->product_code;
-                  $item = $this->products_model->get($pdCode);
-
-                  if(empty($item->old_code) OR $item->old_code == $pdCode)
-                  {
-                    $altCode = $this->products_model->get_last_alt_code($pdCode);
-
-                    if( ! empty($altCode))
-                    {
-                      $pdCode = $altCode;
-                    }
-                  }
-                  else 
-                  {
-                    $pdCode = $item->old_code;
-                  }
-
-                  $details[] = (object) array(
-                    'product_sku' => $pdCode,
-                    'receive_qty' => intval($rs->receive_qty),
-                    'reference_no' => $refCode,
-                    'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
-                  );
-                }
+                }                
               }
               else
               {
@@ -628,22 +559,22 @@ class Receive_po extends PS_Controller
             }
           }
 
-          if($sc === TRUE)
+          if ($sc === TRUE)
           {
             $arr = array(
-            'status' => 1,
-            'shipped_date' => $shipped_date,
-            'update_user' => $this->_user->uname
+              'status' => 1,
+              'shipped_date' => $shipped_date,
+              'update_user' => $this->_user->uname
             );
 
-            if( ! $this->receive_po_model->update($doc->code, $arr))
+            if (! $this->receive_po_model->update($doc->code, $arr))
             {
               $sc = FALSE;
               $this->error = "Faiiled to update document status";
             }
           }
 
-          if($sc === TRUE)
+          if ($sc === TRUE)
           {
             $this->db->trans_commit();
           }
@@ -653,32 +584,27 @@ class Receive_po extends PS_Controller
           }
 
 
-          if($sc === TRUE)
-          {
+          if ($sc === TRUE)
+          {            
             $this->error = "";
 
-            if ($lnwExport && ! empty($details))
+            if ($lnwExport)
             {
-              $this->load->library('lnw_shop_api');
-
-              if (! $this->lnw_shop_api->addStockBatch($details, $doc->code, 'GR'))
+              if (! $this->lnw_export($doc->code))
               {
                 $sc = FALSE;
-                $ex = 0;
-                $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . trim($this->lnw_shop_api->error) . '<br/>';
+                $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . $this->error . '<br/>';
               }
-
-              $this->receive_po_model->update($doc->code, ['lnw_export' => $sc === TRUE ? 1 : 3]);
             }
-
+            
             //-- export to SAP
             $this->load->library('export');
 
-            if(! $this->export->export_receive($doc->code))
+            if (! $this->export->export_receive($doc->code))
             {
               $sc = FALSE;
               $ex = 0;
-              $this->error = "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า SAP ไม่สำเร็จ <br/> ".trim($this->export->error);
+              $this->error = "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า SAP ไม่สำเร็จ <br/> " . trim($this->export->error);
             }
           }
         }
@@ -709,84 +635,78 @@ class Receive_po extends PS_Controller
   }
 
 
-	public function import_data()
-	{
-		$this->load->library('excel');
-		ini_set('max_execution_time', 1200);
+  public function import_data()
+  {
+    $this->load->library('excel');
+    ini_set('max_execution_time', 1200);
+    $sc = TRUE;    
+    $file = isset($_FILES['uploadFile']) ? $_FILES['uploadFile'] : FALSE;
+    $path = $this->config->item('upload_path') . 'receive_po/';
+    $file  = 'uploadFile';
+    $config = array(   // initial config for upload class
+      "allowed_types" => "xlsx",
+      "upload_path" => $path,
+      "file_name"  => "import_receive",
+      "max_size" => 5120,
+      "overwrite" => TRUE
+    );
 
-    $sc = TRUE;
-    $import = 0;
-    $file = isset( $_FILES['uploadFile'] ) ? $_FILES['uploadFile'] : FALSE;
-  	$path = $this->config->item('upload_path').'receive_po/';
-    $file	= 'uploadFile';
-		$config = array(   // initial config for upload class
-			"allowed_types" => "xlsx",
-			"upload_path" => $path,
-			"file_name"	=> "import_receive",
-			"max_size" => 5120,
-			"overwrite" => TRUE
-		);
+    $this->load->library("upload", $config);
 
-		$this->load->library("upload", $config);
-
-		if(! $this->upload->do_upload($file))
+    if (! $this->upload->do_upload($file))
     {
-			echo $this->upload->display_errors();
-		}
+      echo $this->upload->display_errors();
+    }
     else
     {
       $info = $this->upload->data();
       /// read file
-			$excel = PHPExcel_IOFactory::load($info['full_path']);
-			//get only the Cell Collection
-      $cs	= $excel->getActiveSheet()->toArray(NULL, TRUE, TRUE, TRUE);
+      $excel = PHPExcel_IOFactory::load($info['full_path']);
+      //get only the Cell Collection
+      $cs  = $excel->getActiveSheet()->toArray(NULL, TRUE, TRUE, TRUE);
 
       $i = 1;
       $count = count($cs);
-      $limit = intval(getConfig('IMPORT_ROWS_LIMIT')) + 1;
-      $allow = is_true(getConfig('ALLOW_RECEIVE_OVER_PO'));
-			$ro = getConfig('RECEIVE_OVER_PO');
-	    $rate = ($ro * 0.01);
+      $limit = intval(getConfig('IMPORT_ROWS_LIMIT')) + 1;      
+      $ro = getConfig('RECEIVE_OVER_PO');
+      $rate = ($ro * 0.01);
 
-      if( $count <= $limit )
+      if ($count <= $limit)
       {
-				$po_code = $cs[1]['C'];
+        $po_code = $cs[1]['C'];
 
-				if(! empty($po_code))
-				{
-					$vendor = $this->receive_po_model->get_vender_by_po($po_code);
-					$cur = $this->receive_po_model->get_po_currency($po_code);
+        if (! empty($po_code))
+        {
+          $vendor = $this->receive_po_model->get_vender_by_po($po_code);
+          $cur = $this->receive_po_model->get_po_currency($po_code);
 
-					if(! empty($vendor))
-					{
-						$ds = array(
-							"po_code" => $po_code,
-							"invoice_code" => $cs[2]['C'],
-							"vendor_code" => $vendor->CardCode,
-							"vendor_name" => $vendor->CardName,
-							"DocCur" => empty($cur) ? "THB" : $cur->DocCur,
-							"DocRate" => empty($cur) ? 1.00 : $cur->DocRate
-						);
+          if (! empty($vendor))
+          {
+            $ds = array(
+              "po_code" => $po_code,
+              "invoice_code" => $cs[2]['C'],
+              "vendor_code" => $vendor->CardCode,
+              "vendor_name" => $vendor->CardName,
+              "DocCur" => empty($cur) ? "THB" : $cur->DocCur,
+              "DocRate" => empty($cur) ? 1.00 : $cur->DocRate
+            );
 
-						$line = array();
-						$no = 1;
-						$totalBacklog = 0;
-						$totalQty = 0;
-						$totalReceive = 0;
+            $line = array();
+            $no = 1;
+            
+            foreach ($cs as $rs)
+            {
+              if ($i > 7 && !empty($rs['C']))
+              {
+                $detail = $this->receive_po_model->get_po_detail($po_code, $rs['C']);
 
-						foreach($cs as $rs)
-						{
-							if($i > 7 && !empty($rs['C']))
-							{
-								$detail = $this->receive_po_model->get_po_detail($po_code, $rs['C']);
-
-								if(!empty($detail))
-								{
-									$dif = $detail->Quantity - $detail->OpenQty;
+                if (!empty($detail))
+                {
+                  $dif = $detail->Quantity - $detail->OpenQty;
 
                   $arr = array(
                     'no' => $no,
-                    'uid' => $detail->DocEntry.$detail->LineNum,
+                    'uid' => $detail->DocEntry . $detail->LineNum,
                     'baseCode' => $po_code,
                     'baseEntry' => $detail->DocEntry,
                     'baseLine' => $detail->LineNum,
@@ -805,47 +725,47 @@ class Receive_po extends PS_Controller
                     'isOpen' => $detail->LineStatus === 'O' ? TRUE : FALSE
                   );
 
-									array_push($line, $arr);
-									$no++;
-								}
-							}
+                  array_push($line, $arr);
+                  $no++;
+                }
+              }
 
-							$i++;
-						} //--- endforeach
+              $i++;
+            } //--- endforeach
 
-						$ds['details'] = $line;
-					}
-					else
-					{
-						$sc = FALSE;
-						$this->error = "Invalid PO No";
-					}
-				}
-				else
-				{
-					$sc = FALSE;
-					$this->error = "Invalid PO No.";
-				}
-			}
-		}
+            $ds['details'] = $line;
+          }
+          else
+          {
+            $sc = FALSE;
+            $this->error = "Invalid PO No";
+          }
+        }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "Invalid PO No.";
+        }
+      }
+    }
 
-		echo $sc === TRUE ? json_encode($ds) : $this->error;
-	}
+    echo $sc === TRUE ? json_encode($ds) : $this->error;
+  }
 
 
   public function get_sample_file()
   {
-    $path = $this->config->item('upload_path').'receive_po/';
-    $file_name = $path."import_receive_template.xlsx";
+    $path = $this->config->item('upload_path') . 'receive_po/';
+    $file_name = $path . "import_receive_template.xlsx";
 
-    if(file_exists($file_name))
+    if (file_exists($file_name))
     {
       header('Content-Description: File Transfer');
       header('Content-Type:Application/octet-stream');
       header('Cache-Control: no-cache, must-revalidate');
       header('Expires: 0');
-      header('Content-Disposition: attachment; filename="'.basename($file_name).'"');
-      header('Content-Length: '.filesize($file_name));
+      header('Content-Disposition: attachment; filename="' . basename($file_name) . '"');
+      header('Content-Length: ' . filesize($file_name));
       header('Pragma: public');
 
       flush();
@@ -866,24 +786,33 @@ class Receive_po extends PS_Controller
     $this->load->model('approve_logs_model');
 
     $doc = $this->receive_po_model->get($code);
-    if(!empty($doc))
+
+    if (!empty($doc))
     {
       $doc->zone_name = $this->zone_model->get_name($doc->zone_code);
     }
 
     $details = $this->receive_po_model->get_details($code);
-    if(!empty($details))
+
+    if (!empty($details))
     {
-      foreach($details as $rs)
+      foreach ($details as $rs)
       {
         $rs->barcode = $this->products_model->get_barcode($rs->product_code);
       }
     }
 
+    $lnwWhs = getConfig('LNW_SHOP_WAREHOUSE');
+    $lnwApi = is_true(getConfig('LNW_SHOP_API'));
+    $syncStock = is_true(getConfig('SYNC_LNW_SHOP_STOCK'));
+
+    $lnwExport = ($lnwApi && $syncStock && $doc->warehouse_code == $lnwWhs) ? TRUE : FALSE;
+
 
     $ds = array(
       'doc' => $doc,
       'details' => $details,
+      'lnwApi' => $lnwExport,
       'approve_logs' => $this->approve_logs_model->get($doc->request_code)
     );
 
@@ -899,7 +828,7 @@ class Receive_po extends PS_Controller
 
     $doc = $this->receive_po_model->get($code);
 
-    if(!empty($doc))
+    if (!empty($doc))
     {
       $zone = $this->zone_model->get($doc->zone_code);
       $doc->zone_name = empty($zone) ? "" : $zone->name;
@@ -908,9 +837,9 @@ class Receive_po extends PS_Controller
 
     $details = $this->receive_po_model->get_details($code);
 
-    if(!empty($details))
+    if (!empty($details))
     {
-      foreach($details as $rs)
+      foreach ($details as $rs)
       {
         $rs->barcode = $this->products_model->get_barcode($rs->product_code);
       }
@@ -935,7 +864,7 @@ class Receive_po extends PS_Controller
 
     $ds = json_decode($this->input->post('data'));
 
-    if( ! empty($ds))
+    if (! empty($ds))
     {
       $this->load->model('masters/products_model');
       $this->load->model('masters/zone_model');
@@ -947,11 +876,11 @@ class Receive_po extends PS_Controller
 
       $movement_date = getConfig('ORDER_SOLD_DATE') == 'D' ? db_date($ds->doc_date, TRUE) : now();
 
-      if( ! empty($ds->rows))
+      if (! empty($ds->rows))
       {
         $zone = $this->zone_model->get($ds->zone_code);
 
-        if(empty($zone))
+        if (empty($zone))
         {
           $sc = FALSE;
           $this->error = "รหัสโซนไม่ถูกต้อง";
@@ -962,7 +891,7 @@ class Receive_po extends PS_Controller
         $posting_date = empty($ds->posting_date) ? NULL : db_date($ds->posting_date, TRUE);
         $remark = get_null(trim($ds->remark));
 
-        if($sc === TRUE)
+        if ($sc === TRUE)
         {
           $approver = get_null($ds->approver);
           $must_accept = empty($zone->user_id) ? 0 : 1;
@@ -987,36 +916,35 @@ class Receive_po extends PS_Controller
 
           $this->db->trans_begin();
 
-          if( ! $this->receive_po_model->update($doc->code, $arr))
+          if (! $this->receive_po_model->update($doc->code, $arr))
           {
             $sc = FALSE;
             $this->error = 'Update Document Fail';
           }
 
-          if($sc === TRUE)
+          if ($sc === TRUE)
           {
             //--- ลบรายการเก่าก่อนเพิ่มรายการใหม่
-            if( ! $this->receive_po_model->drop_details($doc->code))
+            if (! $this->receive_po_model->drop_details($doc->code))
             {
               $sc = FALSE;
               $this->error = "Failed to delete prevoius item rows";
             }
 
-            if($sc === TRUE)
-            {
-              $details = [];
-              $arr = explode('-', $doc->code);
-              $refCode = count($arr) > 1 ? intval($arr[1]) : $doc->code;
-
-              foreach($ds->rows as $rs)
+            if ($sc === TRUE)
+            {              
+              foreach ($ds->rows as $rs)
               {
-                if($sc === FALSE) { break; }
+                if ($sc === FALSE)
+                {
+                  break;
+                }
 
-                if($rs->qty != 0)
+                if ($rs->qty != 0)
                 {
                   $pd = $this->products_model->get($rs->product_code);
 
-                  if( ! empty($pd))
+                  if (! empty($pd))
                   {
                     $bf = $rs->backlogs; ///--- ยอดค้ารับ ก่อนรับ
                     $af = ($bf - $rs->qty) > 0 ? ($bf - $rs->qty) : 0;  //--- ยอดค้างรับหลังรับแล้ว
@@ -1039,44 +967,18 @@ class Receive_po extends PS_Controller
                       'rate' => empty($ds->DocRate) ? 1 : $ds->DocRate,
                       'vatGroup' => $rs->vatGroup,
                       'vatRate' => $rs->vatRate
-                    );
+                    );                    
 
-                    if($must_accept == 0 && $lnwExport && $ds->save_type != 0)
-                    {
-                      $pdCode = $pd->code;
-
-                      if(empty($pd->old_code) OR $pd->old_code == $pdCode)
-                      {
-                        $altCode = $this->products_model->get_last_alt_code($pdCode);
-
-                        if( ! empty($altCode))
-                        {
-                          $pdCode = $altCode;
-                        }
-                      }
-                      else 
-                      {
-                        $pdCode = $pd->old_code;
-                      }
-
-                      $details[] = (object) array(
-                        'product_sku' => $pdCode,
-                        'stock' => intval($rs->qty),
-                        'reference_no' => $refCode,
-                        'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
-                      );
-                    }
-
-                    if( ! $this->receive_po_model->add_detail($de))
+                    if (! $this->receive_po_model->add_detail($de))
                     {
                       $sc = FALSE;
                       $this->error = 'Add Receive Row Fail';
                       break;
                     }
 
-                    if($sc === TRUE)
+                    if ($sc === TRUE)
                     {
-                      if($must_accept == 0 && $ds->save_type == 1)
+                      if ($must_accept == 0 && $ds->save_type == 1)
                       {
                         //--- insert Movement in
                         $arr = array(
@@ -1089,7 +991,7 @@ class Receive_po extends PS_Controller
                           'date_add' => $movement_date
                         );
 
-                        if( ! $this->movement_model->add($arr))
+                        if (! $this->movement_model->add($arr))
                         {
                           $sc = FALSE;
                           $this->error = "Insert Movement Failed";
@@ -1100,27 +1002,27 @@ class Receive_po extends PS_Controller
                   else
                   {
                     $sc = FALSE;
-                    $this->error = 'ไม่พบรหัสสินค้า : '.$rs->product_code.' ในระบบ';
+                    $this->error = 'ไม่พบรหัสสินค้า : ' . $rs->product_code . ' ในระบบ';
                   }
                 } //--- end if qty != 0
               } //-- end foreach
 
-              if($sc === TRUE)
+              if ($sc === TRUE)
               {
                 $arr = array(
                   'status' => $ds->save_type == 0 ? 0 : ($must_accept == 1 ? 4 : ($ds->save_type == 3 ? 3 : 1))
                 );
 
-                if( ! $this->receive_po_model->update($ds->code, $arr))
+                if (! $this->receive_po_model->update($ds->code, $arr))
                 {
                   $sc = FALSE;
                   $this->error = "Update Document Status Failed";
                 }
               }
-            }//--- end if $sc === TRUE
+            } //--- end if $sc === TRUE
           } //--- $sc == TRUE
 
-          if($sc === TRUE)
+          if ($sc === TRUE)
           {
             $this->db->trans_commit();
           }
@@ -1130,33 +1032,28 @@ class Receive_po extends PS_Controller
           }
         } //-- $sc == TRUE
 
-        if($sc === TRUE && $must_accept == 0 && $ds->save_type != 0)
+        if ($sc === TRUE && $must_accept == 0 && $ds->save_type != 0)
         {
-          if($ds->save_type == 1)
-          {       
+          if ($ds->save_type == 1)
+          {
             $this->error = "";
 
-            if($lnwExport && ! empty($details))
+            if ($lnwExport)
             {
-              $this->load->library('lnw_shop_api');
-
-              if( ! $this->lnw_shop_api->addStockBatch($details, $doc->code, 'GR'))
+              if( ! $this->lnw_export($doc->code))
               {
                 $sc = FALSE;
-                $ex = 0;
-                $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> ".trim($this->lnw_shop_api->error).'<br/>';
-              }
-
-              $this->receive_po_model->update($doc->code, ['lnw_export' => $sc === TRUE ? 1 : 3]);
+                $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . $this->error . '<br/>';
+              }              
             }
 
             $this->load->library('export');
 
-            if(! $this->export->export_receive($doc->code))
+            if (! $this->export->export_receive($doc->code))
             {
               $sc = FALSE;
               $ex = 0;
-              $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า SAP ไม่สำเร็จ <br/> ".trim($this->export->error).'<br/>';
+              $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า SAP ไม่สำเร็จ <br/> " . trim($this->export->error) . '<br/>';
             }
           }
         }
@@ -1197,24 +1094,27 @@ class Receive_po extends PS_Controller
 
     $movement_date = getConfig('ORDER_SOLD_DATE') == 'D' ? $doc->date_add : now();
 
-    if( ! empty($doc))
+    if (! empty($doc))
     {
-      if($doc->status == 4)
+      if ($doc->status == 4)
       {
         $details = $this->receive_po_model->get_details($code);
 
         $this->db->trans_begin();
 
-        if( ! empty($details))
+        if (! empty($details))
         {
-          if($save_type == 1)
+          if ($save_type == 1)
           {
             //--- update movement
-            foreach($details as $rs)
+            foreach ($details as $rs)
             {
-              if($sc === FALSE) { break; }
+              if ($sc === FALSE)
+              {
+                break;
+              }
 
-              if($rs->qty > 0)
+              if ($rs->qty > 0)
               {
                 $af = $rs->before_backlogs - $rs->qty;
                 $amount = $rs->qty * $rs->price;
@@ -1226,13 +1126,13 @@ class Receive_po extends PS_Controller
                   'valid' => 1
                 );
 
-                if( ! $this->receive_po_model->update_detail($rs->id, $arr))
+                if (! $this->receive_po_model->update_detail($rs->id, $arr))
                 {
                   $sc = FALSE;
                   $this->error = "Failed to update receive qty";
                 }
 
-                if($sc === TRUE)
+                if ($sc === TRUE)
                 {
                   //--- insert Movement in
                   $arr = array(
@@ -1245,7 +1145,7 @@ class Receive_po extends PS_Controller
                     'date_add' => $movement_date
                   );
 
-                  if( ! $this->movement_model->add($arr))
+                  if (! $this->movement_model->add($arr))
                   {
                     $sc = FALSE;
                     $this->error = "Insert Movement Failed";
@@ -1255,20 +1155,23 @@ class Receive_po extends PS_Controller
             } //--- foreach
           }
 
-          if($save_type == 3)
+          if ($save_type == 3)
           {
-            foreach($details as $rs)
+            foreach ($details as $rs)
             {
-              if($sc === FALSE) { break; }
+              if ($sc === FALSE)
+              {
+                break;
+              }
 
-              if($rs->receive_qty > 0)
+              if ($rs->receive_qty > 0)
               {
                 $arr = array(
                   'receive_qty' => 0,
                   'valid' => 0
                 );
 
-                if( ! $this->receive_po_model->update_detail($rs->id, $arr))
+                if (! $this->receive_po_model->update_detail($rs->id, $arr))
                 {
                   $sc = FALSE;
                   $this->error = "Failed to reset receive qty";
@@ -1278,7 +1181,7 @@ class Receive_po extends PS_Controller
           }
         } //-- details
 
-        if($sc === TRUE)
+        if ($sc === TRUE)
         {
           $status = $save_type == 3 ? 3 : 1;
 
@@ -1290,19 +1193,19 @@ class Receive_po extends PS_Controller
             'accept_remark' => $remark
           );
 
-          if($status == 1)
+          if ($status == 1)
           {
             $arr['shipped_date'] = empty($doc->shipped_date) ? now() : $doc->shipped_date;
           }
 
-          if( ! $this->receive_po_model->update($code, $arr))
+          if (! $this->receive_po_model->update($code, $arr))
           {
             $sc = FALSE;
             $this->error = "Update Document Status Failed";
           }
         }
 
-        if($sc === TRUE)
+        if ($sc === TRUE)
         {
           $this->db->trans_commit();
         }
@@ -1317,9 +1220,9 @@ class Receive_po extends PS_Controller
         $this->error = "Invalid Document Status";
       }
 
-      if($sc === TRUE)
+      if ($sc === TRUE)
       {
-        if($save_type == 1)
+        if ($save_type == 1)
         {
           $this->error = "";
 
@@ -1327,61 +1230,22 @@ class Receive_po extends PS_Controller
           $lnwApi = is_true(getConfig('LNW_SHOP_API'));
           $syncStock = is_true(getConfig('SYNC_LNW_SHOP_STOCK'));
 
-          if($doc->warehouse_code == $lnwWhs && $lnwApi && $syncStock && ! empty($details))
+          if ($doc->warehouse_code == $lnwWhs && $lnwApi && $syncStock && ! empty($details))
           {
-            $this->load->library('lnw_shop_api');
-
-            $products = [];
-            $arr = explode('-', $doc->code);
-            $refCode = count($arr) > 1 ? intval($arr[1]) : $doc->code;
-
-            foreach($details as $rs)
+            if(! $this->lnw_export($code))
             {
-              $pdCode = $rs->product_code;
-              $item = $this->products_model->get($pdCode);
-
-              if(empty($item->old_code) OR $item->old_code == $pdCode)
-              {
-                $altCode = $this->products_model->get_last_alt_code($pdCode);
-
-                if( ! empty($altCode))
-                {
-                  $pdCode = $altCode;
-                }
-              }
-              else 
-              {
-                $pdCode = $item->old_code;
-              }
-
-              $products[] = (object) array(
-                'product_sku' => $pdCode,
-                'stock' => intval($rs->qty),
-                'reference_no' => $refCode,
-                'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
-              );
-            }
-
-            if( ! empty($products))
-            {
-              if( ! $this->lnw_shop_api->addStockBatch($products, $code, 'GR'))
-              {
-                $sc = FALSE;
-                $ex = 0;
-                $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> ".trim($this->lnw_shop_api->error).'<br/>';
-              }
-
-              $this->receive_po_model->update($doc->code, ['lnw_export' => $sc === TRUE ? 1 : 3]);
-            }
+              $sc = FALSE;
+              $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . $this->error . '<br/>';
+            }            
           }
 
           $this->load->library('export');
 
-          if(! $this->export->export_receive($code))
+          if (! $this->export->export_receive($code))
           {
             $sc = FALSE;
             $ex = 0;
-            $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า SAP ไม่สำเร็จ <br/> ".trim($this->export->error).'<br/>';
+            $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า SAP ไม่สำเร็จ <br/> " . trim($this->export->error) . '<br/>';
           }
         }
       }
@@ -1393,8 +1257,8 @@ class Receive_po extends PS_Controller
     }
 
     $arr = array(
-    'status' => $sc === TRUE ? 'success' : ($ex == 0 ? 'warning' : 'failed'),
-    'message' => $sc === TRUE ? 'success' : $this->error
+      'status' => $sc === TRUE ? 'success' : ($ex == 0 ? 'warning' : 'failed'),
+      'message' => $sc === TRUE ? 'success' : $this->error
     );
 
     echo json_encode($arr);
@@ -1402,21 +1266,21 @@ class Receive_po extends PS_Controller
 
 
   public function pull_back()
-	{
-		$sc = TRUE;
-		$code = trim($this->input->post('code'));
+  {
+    $sc = TRUE;
+    $code = trim($this->input->post('code'));
 
-		if($this->_SuperAdmin)
-		{
-			$doc = $this->receive_po_model->get($code);
+    if ($this->_SuperAdmin)
+    {
+      $doc = $this->receive_po_model->get($code);
 
-			if( ! empty($doc))
-			{
-        if($doc->status == 1)
+      if (! empty($doc))
+      {
+        if ($doc->status == 1)
         {
           $sap = $this->receive_po_model->get_sap_receive_doc($code);
 
-          if( ! empty($sap))
+          if (! empty($sap))
           {
             $sc = FALSE;
             $this->error = "เอกสารถูกนำเข้า SAP แล้ว หากต้องการเปลี่ยนแปลงกรุณายกเลิกเอกสารใน SAP ก่อน";
@@ -1425,11 +1289,11 @@ class Receive_po extends PS_Controller
           {
             $middle = $this->receive_po_model->get_middle_receive_po($code);
 
-            if(!empty($middle))
+            if (!empty($middle))
             {
-              foreach($middle as $rows)
+              foreach ($middle as $rows)
               {
-                if( ! $this->receive_po_model->drop_sap_received($rows->DocEntry))
+                if (! $this->receive_po_model->drop_sap_received($rows->DocEntry))
                 {
                   $sc = FALSE;
                   $this->error = "ลบรายการที่ค้างใน temp ไม่สำเร็จ";
@@ -1439,28 +1303,28 @@ class Receive_po extends PS_Controller
           }
         }
 
-        if($sc === TRUE)
+        if ($sc === TRUE)
         {
           $this->db->trans_begin();
 
-          if($doc->status == 2)
+          if ($doc->status == 2)
           {
             $arr = array(
               'is_cancle' => 0
             );
 
-            if( ! $this->receive_po_model->update_details($code, $arr))
+            if (! $this->receive_po_model->update_details($code, $arr))
             {
               $sc = FALSE;
               $this->error = "Failed to roll back transections";
             }
           }
 
-          if($sc === TRUE)
+          if ($sc === TRUE)
           {
             $this->load->model('inventory/movement_model');
 
-            if( ! $this->movement_model->drop_movement($code))
+            if (! $this->movement_model->drop_movement($code))
             {
               $sc = FALSE;
               $this->error = "Failed to remove movement";
@@ -1468,14 +1332,14 @@ class Receive_po extends PS_Controller
           }
 
 
-          if($sc === TRUE)
+          if ($sc === TRUE)
           {
             $arr = array(
               'status' => 0,
               'inv_code' => NULL
             );
 
-            if( ! $this->receive_po_model->update($code, $arr))
+            if (! $this->receive_po_model->update($code, $arr))
             {
               $sc = FALSE;
               $this->error = "Failed to update document status";
@@ -1483,7 +1347,7 @@ class Receive_po extends PS_Controller
           }
 
 
-          if($sc === TRUE)
+          if ($sc === TRUE)
           {
             $this->db->trans_commit();
           }
@@ -1493,187 +1357,204 @@ class Receive_po extends PS_Controller
           }
         }
 
-        if($sc === TRUE)
+        if ($sc === TRUE)
         {
-          if($doc->lnw_export == 1)
+          if ($doc->lnw_export == 1 OR $doc->lnw_export == 2)
           {
+            $lnwWhs = getConfig('LNW_SHOP_WAREHOUSE');
             $lnwApi = is_true(getConfig('LNW_SHOP_API'));
             $syncStock = is_true(getConfig('SYNC_LNW_SHOP_STOCK'));
 
-            if($lnwApi && $syncStock)
+            if ($lnwApi && $syncStock && $doc->warehouse_code == $lnwWhs)
             {
-              $details = $this->receive_po_model->get_details($code);
+              $isCancel = TRUE; //--- action like cancel stock in LNW SHOP
 
-              if( ! empty($details))
+              if( ! $this->lnw_export($code, $isCancel))
               {
-                $products = [];
-                $arr = explode('-', $code);
-                $refCode = count($arr) > 1 ? intval($arr[1]) : $code;
-
-                foreach($details as $rs)
-                {
-                  $pdCode = $rs->product_code;
-                  $item = $this->products_model->get($pdCode);
-
-                  if(empty($item->old_code) OR $item->old_code == $pdCode)
-                  {
-                    $altCode = $this->products_model->get_last_alt_code($pdCode);
-
-                    if( ! empty($altCode))
-                    {
-                      $pdCode = $altCode;
-                    }
-                  }
-                  else 
-                  {
-                    $pdCode = $item->old_code;
-                  }
-
-                  $products[] = (object) array(
-                    'product_sku' => $pdCode,
-                    'stock' => 0,
-                    'reference_no' => $refCode,
-                    'detail' => "ย้อนสถานะการรับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
-                  );
-                }
-
-                if( ! empty($products))
-                {
-                  $this->load->library('lnw_shop_api');
-
-                  if( ! $this->lnw_shop_api->cancelStockBatch($products, $code, 'GR'))
-                  {
-                    $sc = FALSE;                    
-                    $this->error = "ย้อนสถานะสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> ".trim($this->lnw_shop_api->error).'<br/>';
-                  }
-
-                  if($sc === TRUE)
-                  {
-                    $this->receive_po_model->update($code, ['lnw_export' => NULL]);
-                  }
-                }
-              }
+                $sc = FALSE;
+                $this->error .= "ย้อนสถานะสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . $this->error . '<br/>';
+              }             
             }
-          }            
+          }
+
+          $this->receive_po_model->update($code, ['lnw_export' => 0]);
         }
-			}
-			else
-			{
-				$sc = FALSE;
-				$this->error = "Invalid Document number";
-			}
-		}
-		else
-		{
-			$sc = FALSE;
-			set_error('permission');
-		}
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "Invalid Document number";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      set_error('permission');
+    }
 
-		echo $sc === TRUE ? 'success' : $this->error;
-	}
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
 
 
-  public function send_to_lnw_shop($code)
+  public function lnw_export($code, $isCancel = FALSE) 
   {
     $sc = TRUE;
     $doc = $this->receive_po_model->get($code);
     $details = $this->receive_po_model->get_details($code);
-    $lnwWhs = getConfig('LNW_SHOP_WAREHOUSE');
-    $lnwApi = is_true(getConfig('LNW_SHOP_API'));
-    $syncStock = is_true(getConfig('SYNC_LNW_SHOP_STOCK'));
 
-    if(empty($doc))
+    if (empty($doc))
     {
       $sc = FALSE;
       $this->error = "Invalid document number";
     }
 
-    if($sc === TRUE && $doc->status != 1)
-    {
-      $sc = FALSE;
-      $this->error = "Invalid document status";
-    }
-
-    if($sc === TRUE && $doc->lnw_export == 1)
-    {
-      $sc = FALSE;
-      $this->error = "Document has already been sent to LNW SHOP";
-    }
-
-    if($sc === TRUE && (! $lnwApi OR ! $syncStock))
-    {
-      $sc = FALSE;
-      $this->error = "LNW SHOP API is not enabled";
-    }
-
-    if($sc === TRUE && ($doc->warehouse_code != $lnwWhs))
-    {
-      $sc = FALSE;
-      $this->error = "Document warehouse does not match LNW SHOP warehouse";
-    }
-
-    if($sc === TRUE && empty($details))
+    if ($sc === TRUE && empty($details))
     {
       $sc = FALSE;
       $this->error = "Document has no details to send";
     }
 
-    if($sc === TRUE)
+    if ($sc === TRUE)
     {
       $this->load->library('lnw_shop_api');
 
       $products = [];
+      $rows = [];
       $arr = explode('-', $doc->code);
       $refCode = count($arr) > 1 ? intval($arr[1]) : $doc->code;
 
-      foreach($details as $rs)
+      foreach ($details as $rs)
       {
         $pdCode = $rs->product_code;
         $item = $this->products_model->get($pdCode);
 
-        if(empty($item->old_code) OR $item->old_code == $pdCode)
+        if (empty($item->old_code) or $item->old_code == $pdCode)
         {
           $altCode = $this->products_model->get_last_alt_code($pdCode);
 
-          if( ! empty($altCode))
+          if (! empty($altCode))
           {
             $pdCode = $altCode;
           }
         }
-        else 
+        else
         {
           $pdCode = $item->old_code;
         }
-        
+
         $products[] = (object) array(
+          'id' => $rs->id,
           'product_sku' => $pdCode,
           'stock' => intval($rs->receive_qty),
           'reference_no' => $refCode,
           'detail' => "รับสินค้าเข้าคลังจากการซื้อ PO: {$doc->po_code}"
         );
+
+        $rows[] = (object) array(
+          'id' => $rs->id,
+          'lnw_sku' => $pdCode
+        );
       }
 
-      if(! empty($products))
+      if (! empty($rows))
       {
-        if(! $this->lnw_shop_api->addStockBatch($products, $doc->code, 'GR'))
+        foreach ($rows as $row)
+        {
+          $this->receive_po_model->update_detail($row->id, ['lnw_sku' => $row->lnw_sku]);
+        }
+      }
+
+      if (! empty($products))
+      {
+        $result = ($doc->status == 2 OR $isCancel == TRUE) ? $this->lnw_shop_api->cancelStockBatch($products, $doc->code, 'GR') : $this->lnw_shop_api->addStockBatch($products, $doc->code, 'GR');
+
+        if (is_array($result))
+        {
+          if ($result['status'] == 'success')
+          {
+            foreach ($rows as $row)
+            {
+              $this->receive_po_model->update_detail($row->id, ['lnw_status' => 1]);
+            }
+          }
+
+          if ($result['status'] == 'partial')
+          {
+            if (! empty($result['error_products']))
+            {
+              foreach ($result['error_products'] as $rs)
+              {
+                $this->receive_po_model->set_lnw_sku_status($doc->code, $rs->product_sku, 3, $rs->error_code . ' ' . $rs->error_message);
+              }
+            }
+
+            $sc = FALSE;
+            $this->error = $result['message'];
+          }
+
+          if ($result['status'] == 'error')
+          {
+            if (! empty($result['error_products']))
+            {
+              foreach ($result['error_products'] as $rs)
+              {
+                $this->receive_po_model->set_lnw_sku_status($doc->code, $rs->product_sku, 3, $rs->error_code . ' ' . $rs->error_message);
+              }
+            }
+
+            $sc = FALSE;
+            $this->error = $result['message'];
+          }
+
+          $this->receive_po_model->update($doc->code, ['lnw_export' => $result['request_status']]);
+        }
+        else
         {
           $sc = FALSE;
-          $this->error = "Failed to send data to LNW SHOP: " . trim($this->lnw_shop_api->error);
+          $this->error = $this->lnw_shop_api->error;
         }
-
-        $this->receive_po_model->update($doc->code, ['lnw_export' => $sc === TRUE ? 1 : 3]);
       }
+    }
+
+    return $sc;
+  }
+
+
+  public function send_to_lnw_shop($code, $isCancel = 0)
+  {
+    $sc = TRUE;
+
+    if (! empty($code))
+    {
+      $lnwApi = is_true(getConfig('LNW_SHOP_API'));
+      $syncStock = is_true(getConfig('SYNC_LNW_SHOP_STOCK'));
+
+      if (! $lnwApi or ! $syncStock)
+      {
+        $sc = FALSE;
+        $this->error = "LNW SHOP API is not enabled";
+      }
+      else
+      {
+        $isCancel = $isCancel == 1 ? TRUE : FALSE;
+        $sc = $this->lnw_export($code, $isCancel);
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "Document code is required";
     }
 
     $this->_response($sc);
   }
-  
+
 
   public function do_export($code)
   {
     $sc = TRUE;
 
-    if( ! $this->export_receive($code))
+    if (! $this->export_receive($code))
     {
       $sc = FALSE;
     }
@@ -1696,7 +1577,7 @@ class Receive_po extends PS_Controller
 
     $this->load->library('export');
 
-    if(! $this->export->export_receive($code))
+    if (! $this->export->export_receive($code))
     {
       $sc = FALSE;
       $this->error = trim($this->export->error);
@@ -1710,42 +1591,42 @@ class Receive_po extends PS_Controller
   {
     $sc = TRUE;
 
-    if($this->input->post('receive_code'))
+    if ($this->input->post('receive_code'))
     {
       $this->load->model('inventory/movement_model');
       $code = $this->input->post('receive_code');
-			$reason = $this->input->post('reason');      
+      $reason = $this->input->post('reason');
       $doc = $this->receive_po_model->get($code);
 
-      if( ! empty($doc))
+      if (! empty($doc))
       {
         //---- check doc status is open or close
         //---- if closed user cannot cancle document
         $sap = $this->receive_po_model->get_sap_receive_doc($code);
 
-        if(empty($sap))
+        if (empty($sap))
         {
           $middle = $this->receive_po_model->get_middle_receive_po($code);
 
-          if(! empty($middle))
+          if (! empty($middle))
           {
-            foreach($middle as $rs)
+            foreach ($middle as $rs)
             {
               $this->receive_po_model->drop_sap_received($rs->DocEntry);
             }
           }
 
-          if($sc === TRUE)
+          if ($sc === TRUE)
           {
             $this->db->trans_begin();
 
-            if( ! $this->receive_po_model->update_details($code, ['is_cancle' => 1]))
+            if (! $this->receive_po_model->update_details($code, ['is_cancle' => 1]))
             {
               $sc = FALSE;
               $this->error = "Failed to cancel transections";
             }
 
-            if($sc === TRUE)
+            if ($sc === TRUE)
             {
               $arr = array(
                 'status' => 2,
@@ -1755,62 +1636,62 @@ class Receive_po extends PS_Controller
                 'cancle_date' => now()
               );
 
-              if( ! $this->receive_po_model->update($code, $arr))
+              if (! $this->receive_po_model->update($code, $arr))
               {
                 $sc = FALSE;
                 $this->error = "Failed to update document status";
               }
             }
 
-            if($sc === TRUE)
+            if ($sc === TRUE)
             {
-              if( ! $this->movement_model->drop_movement($code))
+              if (! $this->movement_model->drop_movement($code))
               {
                 $sc = FALSE;
                 $this->error = "Failed to remove movement";
               }
             }
 
-            if($sc === TRUE)
+            if ($sc === TRUE)
             {
               $this->db->trans_commit();
             }
-            else 
+            else
             {
               $this->db->trans_rollback();
-            }            
+            }
           }
 
-          if($sc === TRUE && $doc->status == 1 && $doc->lnw_export == 1)
+          if ($sc === TRUE && $doc->status == 1 && $doc->lnw_export == 1)
           {
             $lnwApi = is_true(getConfig('LNW_SHOP_API'));
             $syncStock = is_true(getConfig('SYNC_LNW_SHOP_STOCK'));
 
-            if($lnwApi && $syncStock)
+            if ($lnwApi && $syncStock)
             {
               $details = $this->receive_po_model->get_details($code);
 
-              if( ! empty($details))
+              if (! empty($details))
               {
                 $products = [];
                 $arr = explode('-', $code);
                 $refCode = count($arr) > 1 ? intval($arr[1]) : $code;
 
-                foreach($details as $rs)
+                foreach ($details as $rs)
                 {
                   $pdCode = $rs->product_code;
                   $item = $this->products_model->get($pdCode);
 
-                  if(empty($item->old_code) OR $item->old_code == $pdCode)
+                  if (empty($item->old_code) or $item->old_code == $pdCode)
                   {
                     $altCode = $this->products_model->get_last_alt_code($pdCode);
 
-                    if( ! empty($altCode))
+                    if (! empty($altCode))
                     {
                       $pdCode = $altCode;
                     }
                   }
-                  else 
+                  else
                   {
                     $pdCode = $item->old_code;
                   }
@@ -1823,17 +1704,17 @@ class Receive_po extends PS_Controller
                   );
                 }
 
-                if( ! empty($products))
+                if (! empty($products))
                 {
                   $this->load->library('lnw_shop_api');
 
-                  if( ! $this->lnw_shop_api->cancelStockBatch($products, $code, 'GR'))
+                  if (! $this->lnw_shop_api->cancelStockBatch($products, $code, 'GR'))
                   {
-                    $sc = FALSE;                    
-                    $this->error = "ยกเลิกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> ".trim($this->lnw_shop_api->error).'<br/>';
+                    $sc = FALSE;
+                    $this->error = "ยกเลิกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . trim($this->lnw_shop_api->error) . '<br/>';
                   }
 
-                  if($sc === TRUE)
+                  if ($sc === TRUE)
                   {
                     $this->receive_po_model->update($code, ['lnw_export' => NULL]);
                   }
@@ -1869,9 +1750,9 @@ class Receive_po extends PS_Controller
     $sc = TRUE;
 
     $middle = $this->receive_po_model->get_middle_receive_po($code);
-    if(!empty($middle))
+    if (!empty($middle))
     {
-      foreach($middle as $rs)
+      foreach ($middle as $rs)
       {
         $this->receive_po_model->drop_sap_received($rs->DocEntry);
       }
@@ -1890,7 +1771,7 @@ class Receive_po extends PS_Controller
 
     $po = $this->receive_po_model->get_po($po_code);
 
-    if( ! empty($po))
+    if (! empty($po))
     {
       $ro = getConfig('RECEIVE_OVER_PO');
 
@@ -1898,14 +1779,14 @@ class Receive_po extends PS_Controller
 
       $details = $this->receive_po_model->get_po_details($po_code);
 
-      if( ! empty($details))
+      if (! empty($details))
       {
         $no = 1;
 
-        foreach($details as $rs)
+        foreach ($details as $rs)
         {
-  				if($rs->OpenQty > 0)
-  				{
+          if ($rs->OpenQty > 0)
+          {
             $dif = $rs->Quantity - $rs->OpenQty;
             $onOrder = $this->receive_po_model->get_on_order_qty($rs->ItemCode, $po_code, $rs->DocEntry, $rs->LineNum);
 
@@ -1913,7 +1794,7 @@ class Receive_po extends PS_Controller
 
             $arr = array(
               'no' => $no,
-              'uid' => $rs->DocEntry.$rs->LineNum,
+              'uid' => $rs->DocEntry . $rs->LineNum,
               'baseCode' => $po_code,
               'baseEntry' => $rs->DocEntry,
               'baseLine' => $rs->LineNum,
@@ -1936,7 +1817,7 @@ class Receive_po extends PS_Controller
 
             array_push($ds, $arr);
             $no++;
-  				}
+          }
         }
       }
       else
@@ -1971,27 +1852,27 @@ class Receive_po extends PS_Controller
   {
     $this->load->model('masters/zone_model');
     $this->load->helper('warehouse');
-		$this->load->helper('currency');
+    $this->load->helper('currency');
 
     $doc = $this->receive_po_model->get($code);
 
-    if( ! empty($doc))
+    if (! empty($doc))
     {
-      if($doc->status == 0 OR $doc->status == 3)
+      if ($doc->status == 0 or $doc->status == 3)
       {
         $details = $this->receive_po_model->get_details($code);
 
-        if( ! empty($details))
+        if (! empty($details))
         {
           $ro = getConfig('RECEIVE_OVER_PO');
-    	    $rate = ($ro * 0.01);
+          $rate = ($ro * 0.01);
 
-          foreach($details as $rs)
+          foreach ($details as $rs)
           {
             //-- get Quantity, Openqty
             $row = $this->receive_po_model->get_po_row($rs->baseEntry, $rs->baseLine);
 
-            if( ! empty($row))
+            if (! empty($row))
             {
               $diff = $row->Quantity - $row->OpenQty;
               $rs->backlogs = $row->OpenQty;
@@ -2029,21 +1910,21 @@ class Receive_po extends PS_Controller
   }
 
 
-	public function get_po_currency()
-	{
-		$po_code = $this->input->get('po_code');
+  public function get_po_currency()
+  {
+    $po_code = $this->input->get('po_code');
 
-		$rs = $this->receive_po_model->get_po_currency($po_code);
+    $rs = $this->receive_po_model->get_po_currency($po_code);
 
-		if(!empty($rs))
-		{
-			echo json_encode($rs);
-		}
-		else
-		{
-			echo "not found";
-		}
-	}
+    if (!empty($rs))
+    {
+      echo json_encode($rs);
+    }
+    else
+    {
+      echo "not found";
+    }
+  }
 
 
   public function add_new()
@@ -2056,7 +1937,7 @@ class Receive_po extends PS_Controller
   public function is_exists($code)
   {
     $ext = $this->receive_po_model->is_exists($code);
-    if($ext)
+    if ($ext)
     {
       echo 'เลขที่เอกสารซ้ำ';
     }
@@ -2077,7 +1958,7 @@ class Receive_po extends PS_Controller
 
     $code = $this->get_new_code($date_add);
 
-    if( ! empty($code))
+    if (! empty($code))
     {
       $arr = array(
         'code' => $code,
@@ -2093,7 +1974,7 @@ class Receive_po extends PS_Controller
         'user' => $this->_user->uname
       );
 
-      if( ! $this->receive_po_model->add($arr))
+      if (! $this->receive_po_model->add($arr))
       {
         $sc = FALSE;
         $this->error = "Create Document Failed";
@@ -2124,13 +2005,13 @@ class Receive_po extends PS_Controller
     $posting_date = empty($this->input->post('posting_date')) ? $due_date : db_date($this->input->post('posting_date', TRUE));
     $remark = get_null(trim($this->input->post('remark')));
 
-    if(!empty($code))
+    if (!empty($code))
     {
       $doc = $this->receive_po_model->get($code);
 
-      if(!empty($doc))
+      if (!empty($doc))
       {
-        if($doc->status == 0)
+        if ($doc->status == 0)
         {
           $arr = array(
             'date_add' => $date_add,
@@ -2139,7 +2020,7 @@ class Receive_po extends PS_Controller
             'remark' => $remark
           );
 
-          if(! $this->receive_po_model->update($code, $arr))
+          if (! $this->receive_po_model->update($code, $arr))
           {
             $sc = FALSE;
             $this->error = "ปรับปรุงข้อมูลไม่สำเร็จ";
@@ -2183,16 +2064,16 @@ class Receive_po extends PS_Controller
     $M = date('m', strtotime($date));
     $prefix = getConfig('PREFIX_RECEIVE_PO');
     $run_digit = getConfig('RUN_DIGIT_RECEIVE_PO');
-    $pre = $prefix .'-'.$Y.$M;
+    $pre = $prefix . '-' . $Y . $M;
     $code = $this->receive_po_model->get_max_code($pre);
-    if(!empty($code))
+    if (!empty($code))
     {
-      $run_no = mb_substr($code, ($run_digit*-1), NULL, 'UTF-8') + 1;
-      $new_code = $prefix . '-' . $Y . $M . sprintf('%0'.$run_digit.'d', $run_no);
+      $run_no = mb_substr($code, ($run_digit * -1), NULL, 'UTF-8') + 1;
+      $new_code = $prefix . '-' . $Y . $M . sprintf('%0' . $run_digit . 'd', $run_no);
     }
     else
     {
-      $new_code = $prefix . '-' . $Y . $M . sprintf('%0'.$run_digit.'d', '001');
+      $new_code = $prefix . '-' . $Y . $M . sprintf('%0' . $run_digit . 'd', '001');
     }
 
     return $new_code;
@@ -2223,7 +2104,7 @@ class Receive_po extends PS_Controller
   public function get_vender_by_po($po_code)
   {
     $rs = $this->receive_po_model->get_vender_by_po($po_code);
-    if(!empty($rs))
+    if (!empty($rs))
     {
       $arr = array(
         'code' => $rs->CardCode,
@@ -2237,5 +2118,4 @@ class Receive_po extends PS_Controller
       echo 'Not found';
     }
   }
-
 } //--- end class

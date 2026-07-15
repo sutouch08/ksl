@@ -144,6 +144,17 @@ class Receive_po_model extends CI_Model
 	}
 
 
+  public function set_lnw_sku_status($code, $product_code, $status, $message = NULL)
+  {
+    return $this->db
+    ->set('lnw_status', $status)
+    ->set('lnw_error', $message)
+    ->where('receive_code', $code)
+    ->where('lnw_sku', $product_code)
+    ->update($this->td);
+  }
+
+
   public function update_receive_qty($id, $qty)
   {
     return $this->db->set("receive_qty", "receive_qty + {$qty}", FALSE)->where('id', $id)->update($this->td);
