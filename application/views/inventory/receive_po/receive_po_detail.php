@@ -1,4 +1,11 @@
 <?php $this->load->view('include/header'); ?>
+<style>
+	.tableNarrow > thead > tr > th,
+	.tableNarrow > tbody > tr > td {
+		padding: 2px 5px;
+		font-size: 11px;
+	}
+</style>
 <?php
 $pm = get_permission('APACWR', $this->_user->uid, $this->_user->id_profile);
 $canAccept = FALSE;
@@ -161,9 +168,9 @@ else
 	</div>
 	<div class="divider-hidden"> </div>
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding-5 table-responsive">
-		<table class="table table-striped table-bordered" style="min-width:1000px;">
+		<table class="table table-striped table-bordered tableNarrow" style="min-width:1000px;">
 			<thead>
-				<tr class="font-size-12">
+				<tr>
 					<th class="fix-width-40 text-center">ลำดับ</th>
 					<th class="fix-width-200 text-center">รหัสสินค้า</th>
 					<th class="min-width-250">ชื่อสินค้า</th>
@@ -181,13 +188,13 @@ else
 					<?php $total_amount = 0; ?>
 					<?php foreach ($details as $rs) : ?>
 						<?php $red = ($rs->qty == $rs->receive_qty) ? '' : 'red'; ?>
-						<tr class="font-size-12 <?php echo $red; ?>">
+						<tr class="<?php echo $red; ?>">
 							<td class="middle text-center"><?php echo $no; ?></td>
 							<td class="middle">
+								<?php echo $rs->product_code; ?>
 								<?php if($rs->lnw_status == 3) : ?>
 									<i class="fa fa-exclamation-triangle red" title="มีปัญหาเกี่ยวกับสินค้าใน LNW SHOP : <?php echo $rs->lnw_error; ?>" style="margin-right:5px;"></i>
 								<?php endif; ?>
-								<?php echo $rs->product_code; ?>
 							</td>
 							<td class="middle"><?php echo $rs->product_name; ?></td>
 							<td class="middle text-right"><?php echo number($rs->price, 2); ?></td>
