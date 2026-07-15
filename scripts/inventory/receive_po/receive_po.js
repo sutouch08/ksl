@@ -333,6 +333,8 @@ function pullBack(code) {
 						text:rs,
 						type:'error',
 						html:true
+					}, function() {
+						window.location.reload();
 					});
 				}
 			}

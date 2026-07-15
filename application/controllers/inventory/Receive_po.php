@@ -286,7 +286,8 @@ class Receive_po extends PS_Controller
   public function save_and_close()
   {
     $sc = TRUE;
-    $ex = 1;
+    $ex = 1;    
+
     $ds = json_decode($this->input->post('data'));
 
     if (! empty($ds) && ! empty($ds->code))
@@ -418,7 +419,7 @@ class Receive_po extends PS_Controller
             }
 
             if ($sc === TRUE)
-            {
+            {              
               $this->error = "";
               $lnwWhs = getConfig('LNW_SHOP_WAREHOUSE');
 
@@ -432,7 +433,8 @@ class Receive_po extends PS_Controller
                   if (! $this->lnw_export($doc->code))
                   {
                     $sc = FALSE;
-                    $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . $this->error . '<br/>';
+                    $ex = 0;
+                    $this->error = "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . $this->error . '<br/>';
                   }
                 }
               }
@@ -480,7 +482,7 @@ class Receive_po extends PS_Controller
   {
     $this->load->model('inventory/movement_model');
     $sc = TRUE;
-    $ex = 1;
+    $ex = 1;    
     $ds = json_decode($this->input->post('data'));
 
     if (! empty($ds))
@@ -593,7 +595,8 @@ class Receive_po extends PS_Controller
               if (! $this->lnw_export($doc->code))
               {
                 $sc = FALSE;
-                $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . $this->error . '<br/>';
+                $ex = 0;
+                $this->error = "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . $this->error . '<br/>';
               }
             }
             
@@ -604,7 +607,7 @@ class Receive_po extends PS_Controller
             {
               $sc = FALSE;
               $ex = 0;
-              $this->error = "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า SAP ไม่สำเร็จ <br/> " . trim($this->export->error);
+              $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า SAP ไม่สำเร็จ <br/> " . trim($this->export->error);
             }
           }
         }
@@ -1043,7 +1046,8 @@ class Receive_po extends PS_Controller
               if( ! $this->lnw_export($doc->code))
               {
                 $sc = FALSE;
-                $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . $this->error . '<br/>';
+                $ex = 0;
+                $this->error = "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . $this->error . '<br/>';
               }              
             }
 
@@ -1235,7 +1239,8 @@ class Receive_po extends PS_Controller
             if(! $this->lnw_export($code))
             {
               $sc = FALSE;
-              $this->error .= "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . $this->error . '<br/>';
+              $ex = 0;
+              $this->error = "บันทึกสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . $this->error . '<br/>';
             }            
           }
 
@@ -1372,7 +1377,7 @@ class Receive_po extends PS_Controller
               if( ! $this->lnw_export($code, $isCancel))
               {
                 $sc = FALSE;
-                $this->error .= "ย้อนสถานะสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . $this->error . '<br/>';
+                $this->error = "ย้อนสถานะสำเร็จ แต่ส่งข้อมูลเข้า LNW SHOP ไม่สำเร็จ <br/> " . $this->error . '<br/>';
               }             
             }
           }
