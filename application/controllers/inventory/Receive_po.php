@@ -1430,23 +1430,23 @@ class Receive_po extends PS_Controller
 
       foreach ($details as $rs)
       {
-        $pdCode = $rs->product_code;
-        $item = $this->products_model->get($pdCode);
+        $pdCode = $rs->product_code;        
+        $altCode = $this->products_model->get_last_alt_code($pdCode);
 
-        if (empty($item->old_code) or $item->old_code == $pdCode)
+        if(! empty($altCode))
         {
-          $altCode = $this->products_model->get_last_alt_code($pdCode);
-
-          if (! empty($altCode))
-          {
-            $pdCode = $altCode;
-          }
+          $pdCode = $altCode;
         }
         else
         {
-          $pdCode = $item->old_code;
-        }
+          $item = $this->products_model->get($pdCode);
 
+          if( ! empty($item) && ! empty($item->old_code))
+          {
+            $pdCode = $item->old_code;
+          }          
+        }
+        
         $products[] = (object) array(
           'id' => $rs->id,
           'product_sku' => $pdCode,
