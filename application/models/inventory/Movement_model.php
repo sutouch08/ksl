@@ -17,7 +17,6 @@ class Movement_model extends CI_Model
   }
 
 
-
   public function drop_movement($code)
   {
     return $this->db->where('reference', $code)->delete('stock_movement');
@@ -39,18 +38,14 @@ class Movement_model extends CI_Model
 
   public function get_list(array $ds = array(), $perpage = 20, $offset = 0)
   {
-    if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
+    if (! empty($ds['from_date']))
     {
-      $this->db
-      ->where('date_upd >=', from_date($ds['from_date']))
-      ->where('date_upd <=', to_date($ds['to_date']));
+      $this->db->where('date_upd >=', from_date($ds['from_date']));
     }
-    else
-    {
-      $max_id = $this->get_max_id();
-      $max_id = $max_id < 100000 ? 0 : $max_id * 0.8;
 
-      $this->db->where('id >', $max_id);
+    if (! empty($ds['to_date']))
+    {
+      $this->db->where('date_upd <=', to_date($ds['to_date']));
     }
 
     if( ! empty($ds['reference']))
@@ -63,17 +58,15 @@ class Movement_model extends CI_Model
       $this->db->like('product_code', $ds['product_code']);
     }
 
-    if( ! empty($ds['warehouse_code']))
+    if(isset($ds['warehouse_code']) && $ds['warehouse_code'] != 'all')
     {
-      $this->db->like('warehouse_code', $ds['warehouse_code']);
+      $this->db->where('warehouse_code', $ds['warehouse_code']);
     }
 
     if( ! empty($ds['zone_code']))
     {
       $this->db->like('zone_code', $ds['zone_code']);
     }
-
-
 
     $rs = $this->db->order_by('date_upd', 'DESC')->limit($perpage, $offset)->get('stock_movement');
 
@@ -88,20 +81,16 @@ class Movement_model extends CI_Model
 
   public function count_rows(array $ds = array())
   {
-    if( ! empty($ds['from_date']) && ! empty($ds['to_date']))
+    if (! empty($ds['from_date']))
     {
-      $this->db
-      ->where('date_upd >=', from_date($ds['from_date']))
-      ->where('date_upd <=', to_date($ds['to_date']));
-    }
-    else
-    {
-      $max_id = $this->get_max_id();
-      $max_id = $max_id < 100000 ? 0 : $max_id * 0.8;
-
-      $this->db->where('id >', $max_id);
+      $this->db->where('date_upd >=', from_date($ds['from_date']));
     }
 
+    if (! empty($ds['to_date']))
+    {
+      $this->db->where('date_upd <=', to_date($ds['to_date']));
+    }
+    
     if( ! empty($ds['reference']))
     {
       $this->db->like('reference', $ds['reference']);
@@ -112,11 +101,11 @@ class Movement_model extends CI_Model
       $this->db->like('product_code', $ds['product_code']);
     }
 
-    if( ! empty($ds['warehouse_code']))
+    if(isset($ds['warehouse_code']) && $ds['warehouse_code'] != 'all')
     {
-      $this->db->like('warehouse_code', $ds['warehouse_code']);
+      $this->db->where('warehouse_code', $ds['warehouse_code']);
     }
-
+    
     if( ! empty($ds['zone_code']))
     {
       $this->db->like('zone_code', $ds['zone_code']);
@@ -126,6 +115,47 @@ class Movement_model extends CI_Model
   }
 
 
+  public function get_export_data(array $ds = array())
+  {
+    if (! empty($ds['from_date']))
+    {
+      $this->db->where('date_upd >=', from_date($ds['from_date']));
+    }
+
+    if (! empty($ds['to_date']))
+    {
+      $this->db->where('date_upd <=', to_date($ds['to_date']));
+    }
+
+    if (isset($ds['warehouse_code']) && $ds['warehouse_code'] != 'all')
+    {
+      $this->db->where('warehouse_code', $ds['warehouse_code']);
+    }
+
+    if (! empty($ds['reference']))
+    {
+      $this->db->like('reference', $ds['reference'], 'after');
+    }
+
+    if (! empty($ds['product_code']))
+    {
+      $this->db->like('product_code', $ds['product_code'], 'after');
+    }
+
+    if (! empty($ds['zone_code']))
+    {
+      $this->db->like('zone_code', $ds['zone_code']);
+    }
+
+    $rs = $this->db->order_by('date_upd', 'DESC')->get('stock_movement');
+
+    if ($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
 } //--- end class
 
 ?>
