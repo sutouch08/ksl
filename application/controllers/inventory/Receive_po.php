@@ -501,9 +501,6 @@ class Receive_po extends PS_Controller
           $lnwExport = ($lnwApi && $syncStock && $doc->warehouse_code == $lnwWhs) ? TRUE : FALSE;
 
           $this->db->trans_begin();
-          $details = [];
-          $arr = explode('-', $ds->code);
-          $refCode = count($arr) > 1 ? intval($arr[1]) : $ds->code;
 
           if (! empty($ds->rows))
           {
@@ -584,7 +581,6 @@ class Receive_po extends PS_Controller
           {
             $this->db->trans_rollback();
           }
-
 
           if ($sc === TRUE)
           {            
@@ -1431,19 +1427,22 @@ class Receive_po extends PS_Controller
       foreach ($details as $rs)
       {
         $pdCode = $rs->product_code;        
-        $altCode = $this->products_model->get_last_alt_code($pdCode);
+        $item = $this->products_model->get($pdCode);
 
-        if(! empty($altCode))
+        if(! empty($item))
         {
-          $pdCode = $altCode;
-        }
-        else
-        {
-          $item = $this->products_model->get($pdCode);
-
-          if( ! empty($item) && ! empty($item->old_code))
+          if(! empty($item->old_code))
           {
             $pdCode = $item->old_code;
+          }
+          else 
+          {
+            $altCode = $this->products_model->get_last_alt_code($pdCode);
+
+            if(! empty($altCode))
+            {
+              $pdCode = $altCode;
+            }            
           }          
         }
         
@@ -1692,18 +1691,21 @@ class Receive_po extends PS_Controller
                   $pdCode = $rs->product_code;
                   $item = $this->products_model->get($pdCode);
 
-                  if (empty($item->old_code) or $item->old_code == $pdCode)
+                  if(! empty($item))
                   {
-                    $altCode = $this->products_model->get_last_alt_code($pdCode);
-
-                    if (! empty($altCode))
+                    if(!empty($item->old_code))
                     {
-                      $pdCode = $altCode;
+                      $pdCode = $item->old_code;
                     }
-                  }
-                  else
-                  {
-                    $pdCode = $item->old_code;
+                    else 
+                    {
+                      $altCode = $this->products_model->get_last_alt_code($pdCode);
+
+                      if(! empty($altCode))
+                      {
+                        $pdCode = $altCode;
+                      }
+                    }
                   }
 
                   $products[] = (object) array(
