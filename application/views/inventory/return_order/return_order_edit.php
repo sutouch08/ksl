@@ -147,6 +147,7 @@
 										data-invoice="<?php echo empty($rs->invoice_code) ? $rs->bill_code : $rs->invoice_code; ?>"
 										data-order="<?php echo $rs->order_code; ?>"
 										data-sold="<?php echo round($rs->sold_qty); ?>"
+										data-returned="<?php echo $rs->returned_qty; ?>"
 										data-price="<?php echo $rs->price; ?>"
 										data-discount="<?php echo $rs->discount_percent; ?>"
 										value="<?php echo $rs->qty; ?>"
@@ -178,7 +179,6 @@
 			</table>
 		</div>
 	</div>
-
 </form>
 
 

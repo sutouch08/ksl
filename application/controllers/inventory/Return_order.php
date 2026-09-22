@@ -1069,10 +1069,11 @@ class Return_order extends PS_Controller
 				$dt->id = $rs->id;
 				$dt->invoice_code = $doc->invoice;
 				$dt->order_code = $rs->order_code;
-				$dt->barcode = $this->products_model->get_barcode($rs->product_code);
+				$dt->barcode = $rs->barcode;
 				$dt->product_code = $rs->product_code;
 				$dt->product_name = $rs->product_name;
 				$dt->sold_qty = $qty;
+        $dt->returned_qty = $returned_qty;
 				$dt->discount_percent = $rs->discount_percent;
 				$dt->qty = $rs->qty;
 				$dt->price = round($rs->price,2);
