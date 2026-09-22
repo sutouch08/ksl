@@ -1061,7 +1061,9 @@ class Return_order extends PS_Controller
       foreach($details as $rs)
       {
         $returned_qty = $this->return_order_model->get_returned_qty($doc->invoice, $rs->product_code);
-        $qty = $rs->sold_qty - ($returned_qty - $rs->qty);
+        $returned_qty = $returned_qty - $rs->qty;
+        $returned_qty = $returned_qty < 0 ? 0 : $returned_qty;
+        $qty = $rs->sold_qty - $returned_qty;
 
 				$dt = new stdClass();
 				$dt->id = $rs->id;
