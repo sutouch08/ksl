@@ -1041,6 +1041,7 @@ class Return_order extends PS_Controller
             $dt = new stdClass();
             $dt->id = 0;
             $dt->invoice_code = $doc->invoice;
+            $dt->bill_code = $rs->bill_code;
 						$dt->order_code = $rs->order_code;
             $dt->barcode = $this->products_model->get_barcode($rs->product_code);
             $dt->product_code = $rs->product_code;
@@ -1068,6 +1069,7 @@ class Return_order extends PS_Controller
 				$dt = new stdClass();
 				$dt->id = $rs->id;
 				$dt->invoice_code = $doc->invoice;
+        $dt->bill_code = $rs->bill_code;
 				$dt->order_code = $rs->order_code;
 				$dt->barcode = $rs->barcode;
 				$dt->product_code = $rs->product_code;

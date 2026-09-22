@@ -97,7 +97,7 @@
 <form id="detailsForm" method="post" action="<?php echo $this->home . '/add_details/' . $doc->code; ?>">
 	<div class="row">
 		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding-5 table-responsive">
-			<table class="table table-striped border-1" style="margin-bottom:0px; min-width:1200px;">
+			<table class="table table-striped table-narrow border-1" style="margin-bottom:0px; min-width:1200px;">
 				<thead>
 					<tr>
 						<th class="fix-width-40 text-center">ลำดับ</th>
@@ -107,8 +107,8 @@
 						</th>
 						<th class="fix-width-175">รหัส</th>
 						<th class="min-width-200">สินค้า</th>
-						<th class="fix-width-100 text-center">อ้างอิง</th>
-						<th class="fix-width-120 text-center">ออเดอร์</th>
+						<th class="fix-width-150">อ้างอิง/เลขที่บิล</th>
+						<th class="fix-width-100">ออเดอร์</th>
 						<th class="fix-width-80 text-right">จำนวน</th>
 						<th class="fix-width-80 text-right">ราคา</th>
 						<th class="fix-width-100 text-right">ส่วนลด</th>
@@ -131,20 +131,20 @@
 								</td>
 								<td class="middle <?php echo $no; ?>"><?php echo $rs->product_code; ?></td>
 								<td class="middle"><?php echo $rs->product_name; ?></td>
-								<td class="middle text-center"><?php echo empty($rs->invoice_code) ? $rs->bill_code : $rs->invoice_code; ?></td>
-								<td class="middle text-center"><?php echo $rs->order_code; ?></td>
+								<td class="middle"><?php echo empty($rs->invoice_code) ? $rs->bill_code : $rs->invoice_code; ?></td>
+								<td class="middle"><?php echo $rs->order_code; ?></td>
 								<td class="middle text-right inv_qty"><?php echo round($rs->sold_qty); ?></td>
 								<td class="middle text-right"><?php echo $rs->price; ?></td>
 								<td class="middle text-right"><?php echo $rs->discount_percent . ' %'; ?></td>
 								<td class="middle">
 									<input type="number"
-										class="form-control input-sm text-right input-qty"
+										class="form-control input-xs text-right input-qty"
 										id="qty-<?php echo $no; ?>"
 										data-no="<?php echo $no; ?>"
 										data-id="<?php echo $rs->id; ?>"
 										data-pdcode="<?php echo $rs->product_code; ?>"
 										data-pdname="<?php echo $rs->product_name; ?>"
-										data-invoice="<?php echo empty($rs->invoice_code) ? $rs->bill_code : $rs->invoice_code; ?>"
+										data-invoice="<?php echo $rs->invoice_code; ?>"
 										data-order="<?php echo $rs->order_code; ?>"
 										data-sold="<?php echo round($rs->sold_qty); ?>"
 										data-returned="<?php echo $rs->returned_qty; ?>"
