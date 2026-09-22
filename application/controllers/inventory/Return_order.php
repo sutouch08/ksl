@@ -489,7 +489,9 @@ class Return_order extends PS_Controller
                   'price' => $price,
                   'discount_percent' => $discount,
                   'amount' => $amount,
-                  'vat_amount' => get_vat_amount($amount)
+                  'vat_amount' => get_vat_amount($amount),
+                  'bill_code' => get_null($doc->bill_code),
+                  'pos_ref' => get_null($doc->pos_ref)
                 );
 
                 if( ! $this->return_order_model->add_detail($arr))
