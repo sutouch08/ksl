@@ -41,8 +41,9 @@
 			<li class="li-block <?php echo $tab8; ?>" onclick="changeURL('SAP')"><a href="#SAP" data-toggle="tab">ข้อมูล SAP</a></li>
 			<li class="li-block <?php echo $tab9; ?>" onclick="changeURL('ix')"><a href="#ix" data-toggle="tab">IX API</a></li>			
 			<li class="li-block <?php echo $tab10; ?>" onclick="changeURL('pos')"><a href="#pos" data-toggle="tab">POS API</a></li>
+			<?php if($this->_SuperAdmin) : ?>
 			<li class="li-block <?php echo $tab13; ?>" onclick="changeURL('lnw')"><a href="#lnw" data-toggle="tab">LNW SHOP API</a></li>
-
+			<?php endif; ?>
 		</ul>
 	</div>
 	<div class="col-lg-10 col-md-10 col-sm-10 border-1" style="padding-top:15px; border-top:0px !important; height:600px; overflow:auto;">
@@ -82,10 +83,11 @@
 			<div class="tab-pane fade <?php echo $tab10; ?>" id="pos">
 				<?php $this->load->view('setting/setting_pos_api'); ?>
 			</div>
-
+			<?php if($this->_SuperAdmin) : ?>
 			<div class="tab-pane fade <?php echo $tab13; ?>" id="lnw">
 				<?php $this->load->view('setting/setting_lnw_shop_api'); ?>
 			</div>
+			<?php endif; ?>
 
 		</div><!--/ tab-content-->
 	</div><!--/ col-sm-9  -->

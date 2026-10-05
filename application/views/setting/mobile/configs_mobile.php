@@ -38,9 +38,11 @@
 		<div class="menu-block">
 			<a class="menu-link" href="javascript:goSetting('pos')">POS API <i class="fa fa-angle-right pull-right font-size-20"></i></a>
 		</div>
+		<?php if($this->_SuperAdmin) : ?>
 		<div class="menu-block">
 			<a class="menu-link" href="javascript:goSetting('lnw_shop')">LNW SHOP API <i class="fa fa-angle-right pull-right font-size-20"></i></a>
 		</div>
+		<?php endif; ?>
 	</div>
 </div><!--/ row  -->
 <div class="setting-panel move-out" id="general">
@@ -73,9 +75,11 @@
 <div class="setting-panel move-out" id="pos">
 	<?php $this->load->view('setting/mobile/setting_pos_api_mobile'); ?>
 </div>
+<?php if($this->_SuperAdmin) : ?>
 <div class="setting-panel move-out" id="lnw_shop">
 	<?php $this->load->view('setting/mobile/setting_lnw_shop_api_mobile'); ?>
 </div>
+<?php endif; ?>
 
 <script src="<?php echo base_url(); ?>scripts/setting/setting_mobile.js?v=<?php echo date('Ymd'); ?>"></script>
 <script src="<?php echo base_url(); ?>scripts/setting/setting_document.js?v=<?php echo date('Ymd'); ?>"></script>
