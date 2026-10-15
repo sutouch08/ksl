@@ -104,7 +104,7 @@ class Lnw_shop_api
 
             $sc = FALSE;
             $request_status = 3;
-            $this->error = 'Error: ';// . $res->error_code . ' : ' . $res->error_message;
+            $this->error = 'Error: Some products failed to update stock please see logs for details';// . $res->error_code . ' : ' . $res->error_message;
           }
 
           if ($this->logs_json)
